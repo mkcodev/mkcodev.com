@@ -1,0 +1,124 @@
+---
+import Base from '../layouts/Base.astro';
+
+const lang = 'es' as const;
+---
+
+<Base
+  lang={lang}
+  title="404 — command not found"
+  description="La página que buscas no existe."
+  noIndex
+>
+  <div class="container-site nf">
+    <div class="nf-term" role="presentation">
+      <p class="nf-line">
+        <span class="nf-prompt">$</span>
+        <span class="nf-cmd" data-nf-type>bash: page: command not found</span><span
+          class="nf-caret"
+          aria-hidden="true">▍</span
+        >
+      </p>
+      <p class="nf-code" aria-hidden="true">exit code: 404</p>
+    </div>
+
+    <h1 class="nf-title">404</h1>
+    <p class="nf-desc">
+      La página que buscas no existe o se movió.
+      <span class="nf-desc-en">/ The page you're looking for doesn't exist.</span>
+    </p>
+
+    <a class="btn-terminal btn-terminal--primary" href="/">
+      <span class="bracket bracket-l">[</span>
+      cd ~
+      <span class="bracket bracket-r">]</span>
+    </a>
+  </div>
+</Base>
+
+<script>
+  const type = () => {
+    const el = document.querySelector<HTMLElement>('[data-nf-type]');
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const full = el.textContent ?? '';
+    el.textContent = '';
+    let i = 0;
+    const tick = () => {
+      if (!el.isConnected) return;
+      el.textContent = full.slice(0, ++i);
+      if (i < full.length) setTimeout(tick, 26);
+    };
+    setTimeout(tick, 300);
+  };
+  document.addEventListener('astro:page-load', type);
+</script>
+
+<style>
+  .nf {
+    min-height: 70svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-block: clamp(7rem, 14vw, 10rem) 0;
+  }
+
+  .nf-term {
+    width: 100%;
+    max-width: 520px;
+    padding: 1.125rem 1.375rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    margin-bottom: 2.5rem;
+  }
+  .nf-line {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+  .nf-prompt {
+    color: var(--color-accent);
+  }
+  .nf-caret {
+    color: var(--color-accent);
+    animation: nf-blink 1.1s steps(1) infinite;
+  }
+  @keyframes nf-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nf-caret {
+      animation: none;
+    }
+  }
+  .nf-code {
+    margin: 0.5rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+  .nf-title {
+    margin: 0 0 0.75rem;
+    font-size: var(--text-h1);
+    line-height: var(--text-h1--line-height);
+    letter-spacing: -0.04em;
+    color: var(--color-white);
+  }
+  .nf-desc {
+    margin: 0 0 2rem;
+    max-width: 480px;
+    font-size: var(--text-body);
+    color: var(--color-muted);
+  }
+  .nf-desc-en {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-ink-deep);
+  }
+</style>

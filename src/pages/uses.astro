@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import UsesContent from '../components/UsesContent.astro';
+
+const lang = 'es' as const;
+---
+
+<Base
+  lang={lang}
+  title="Uses — Mikel Salvador · setup, herramientas y entorno"
+  description="El setup con el que trabajo: Arch Linux, Hyprland, terminal, VS Code con vim keybindings, Claude Code, Figma y más."
+>
+  <UsesContent lang={lang} />
+</Base>

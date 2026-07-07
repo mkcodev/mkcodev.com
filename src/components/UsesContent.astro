@@ -1,0 +1,140 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { uses } from '../data/uses';
+import type { Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const intro =
+  lang === 'es'
+    ? 'Herramientas y entorno con los que trabajo a diario. Inspirado en uses.tech.'
+    : 'Tools and environment I work with daily. Inspired by uses.tech.';
+---
+
+<div class="container-site uses-page">
+  <SectionHeading marker="~/uses" title={lang === 'es' ? 'Lo que uso' : 'What I use'} />
+
+  <p class="uses-intro" data-reveal-group>
+    <span data-reveal>{intro}</span>
+  </p>
+
+  <div class="uses-cats">
+    {
+      uses.map((cat) => (
+        <section class="uses-cat" aria-labelledby={`uses-${cat.id}`} data-reveal-group>
+          <h2 class="uses-cat-title" id={`uses-${cat.id}`} data-reveal>
+            <span class="uses-prompt">$</span> ls {cat.id}/
+          </h2>
+          <ul class="uses-items">
+            {cat.items.map((item) => (
+              <li class="uses-item" data-reveal>
+                <span class="uses-name">
+                  {item.url ? (
+                    <a href={item.url} rel="noopener" target="_blank">
+                      {item.name} ↗
+                    </a>
+                  ) : (
+                    item.name
+                  )}
+                </span>
+                {item.detail && <span class="uses-detail">{item.detail[lang]}</span>}
+              </li>
+            ))}
+          </ul>
+          <span class="uses-cat-label" aria-hidden="true">
+            {cat.title[lang]}
+          </span>
+        </section>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .uses-page {
+    padding-block: clamp(7rem, 14vw, 10rem) 0;
+  }
+  .uses-intro {
+    margin: 0 0 3rem;
+    max-width: 560px;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-text);
+  }
+
+  .uses-cats {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    .uses-cats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .uses-cat {
+    position: relative;
+    padding: 1.375rem 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-hover) ease;
+  }
+  .uses-cat:hover,
+  .uses-cat:focus-within {
+    border-color: var(--color-border-strong);
+  }
+  .uses-cat-title {
+    margin: 0 0 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+  }
+  .uses-prompt {
+    color: var(--color-accent);
+  }
+  .uses-cat-label {
+    position: absolute;
+    top: 1.375rem;
+    right: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--color-muted);
+  }
+
+  .uses-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .uses-item {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .uses-name {
+    font-size: var(--text-body);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .uses-name a {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--duration-hover) ease;
+  }
+  .uses-name a:hover,
+  .uses-name a:focus-visible {
+    color: var(--color-accent);
+  }
+  .uses-detail {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+</style>
