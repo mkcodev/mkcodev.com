@@ -1,0 +1,39 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/sections/Hero.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import { useTranslations } from '../../i18n/ui';
+
+const lang = 'en' as const;
+const t = useTranslations(lang);
+---
+
+<Base lang={lang} title={t('meta.home.title')} description={t('meta.home.description')}>
+  <Hero lang={lang} />
+
+  <section id="proyectos" class="container-site section-block">
+    <SectionHeading marker={t('section.projects')} title="Projects" />
+  </section>
+
+  <section id="como-trabajo" class="container-site section-block">
+    <SectionHeading marker={t('section.how')} title="How I work" />
+  </section>
+
+  <section id="trayectoria" class="container-site section-block">
+    <SectionHeading marker={t('section.timeline')} title="Timeline" />
+  </section>
+
+  <section id="sobre-mi" class="container-site section-block">
+    <SectionHeading marker={t('section.about')} title="About" />
+  </section>
+
+  <section id="contacto" class="container-site section-block">
+    <SectionHeading marker={t('section.contact')} title="Contact" />
+  </section>
+</Base>
+
+<style>
+  .section-block {
+    padding-block: clamp(4rem, 10vw, 7.5rem) 0;
+  }
+</style>

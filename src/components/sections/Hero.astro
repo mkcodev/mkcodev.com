@@ -1,0 +1,106 @@
+---
+import { SITE, type Lang } from '../../data/site';
+import { useTranslations } from '../../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const home = lang === 'es' ? '/' : '/en';
+---
+
+<section class="hero blueprint" data-hero>
+  <div class="hero-glow" data-hero-glow aria-hidden="true"></div>
+  <div class="container-site hero-inner">
+    <p class="hero-prompt">
+      <span class="hero-prompt-user">mkcodev@arch</span>
+      <span class="hero-prompt-path">~</span>
+      <span class="hero-prompt-sign">&gt;</span> whoami
+    </p>
+    <h1 class="hero-title">{SITE.author}</h1>
+    <p class="hero-role">{SITE.role[lang]}</p>
+    <p class="hero-tagline">{SITE.tagline[lang]}</p>
+    <div class="hero-ctas">
+      <a class="btn-terminal btn-terminal--primary" href={`${home}#proyectos`}>
+        <span class="bracket bracket-l" aria-hidden="true">[</span>
+        {lang === 'es' ? 'ver_proyectos' : 'view_projects'}
+        <span class="bracket bracket-r" aria-hidden="true">]</span>
+      </a>
+      <a class="btn-terminal" href={`${home}#contacto`}>
+        <span class="bracket bracket-l" aria-hidden="true">→</span>
+        {lang === 'es' ? './contactar' : './contact'}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 92dvh;
+    display: flex;
+    align-items: center;
+    padding-top: 96px;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    width: 560px;
+    height: 560px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(0 219 213 / 0.07) 0%, transparent 65%);
+    top: -120px;
+    left: 50%;
+    translate: -50% 0;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .hero-inner {
+    position: relative;
+    width: 100%;
+  }
+  .hero-prompt {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+  .hero-prompt-user {
+    color: var(--color-accent);
+  }
+  .hero-prompt-path {
+    color: var(--color-accent-dark);
+  }
+  .hero-prompt-sign {
+    color: var(--color-muted);
+  }
+  .hero-title {
+    margin: 0;
+    font-size: var(--text-display);
+    font-weight: 700;
+    letter-spacing: var(--text-display--letter-spacing);
+    line-height: var(--text-display--line-height);
+    color: var(--color-white);
+  }
+  .hero-role {
+    margin: 1rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    color: var(--color-accent);
+  }
+  .hero-tagline {
+    margin: 1rem 0 0;
+    max-width: 560px;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-muted);
+  }
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2.25rem;
+  }
+</style>

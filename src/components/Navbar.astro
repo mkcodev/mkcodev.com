@@ -1,0 +1,450 @@
+---
+import { Image } from 'astro:assets';
+
+import logo from '../assets/logo-mkcodev.png';
+import { SITE, type Lang } from '../data/site';
+import { alternatePath } from '../i18n/routes';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const home = lang === 'es' ? '/' : '/en';
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const langTarget = alternatePath(path);
+
+const leftLinks = [
+  { href: `${home}#proyectos`, label: t('nav.projects') },
+  { href: `${home}#como-trabajo`, label: t('nav.how') },
+  { href: `${home}#trayectoria`, label: t('nav.timeline') },
+];
+const rightLinks = [
+  { href: `${home}#sobre-mi`, label: t('nav.about') },
+  { href: lang === 'es' ? '/uses' : '/en/uses', label: t('nav.uses') },
+  { href: `${home}#contacto`, label: t('nav.contact') },
+];
+const allLinks = [...leftLinks, ...rightLinks];
+---
+
+<header class="navbar" data-navbar>
+  <nav class="navbar-bar glass" aria-label="principal">
+    <div class="navbar-inner container-site">
+      <ul class="navbar-links navbar-links--left">
+        {
+          leftLinks.map((link) => (
+            <li>
+              <a class="navbar-link" href={link.href}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <a href={home} class="navbar-logo" aria-label={SITE.name}>
+        <Image src={logo} alt="" width={144} height={144} loading="eager" />
+      </a>
+
+      <div class="navbar-right">
+        <ul class="navbar-links navbar-links--right">
+          {
+            rightLinks.map((link) => (
+              <li>
+                <a class="navbar-link" href={link.href}>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="navbar-lang" href={langTarget} aria-label={t('nav.langLabel')} data-astro-reload>
+          {lang === 'es' ? 'EN' : 'ES'}
+        </a>
+        <button
+          type="button"
+          class="navbar-menu-btn"
+          data-menu-toggle
+          aria-expanded="false"
+          aria-controls="mega-menu"
+          aria-label={t('nav.menuLabel')}
+        >
+          <span class="navbar-menu-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mega-menu glass" id="mega-menu" data-mega-menu hidden>
+    <div class="container-site mega-menu-grid">
+      <ul class="mega-menu-links">
+        {
+          allLinks.map((link, i) => (
+            <li style={`--i: ${i}`}>
+              <a class="mega-menu-link" href={link.href} data-menu-close>
+                <span class="mega-menu-index">0{i + 1}</span>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mega-menu-aside">
+        <p class="mega-menu-badge">
+          <span class="badge-dot" aria-hidden="true"></span>
+          {t('nav.available')}
+        </p>
+        <a class="btn-terminal" href={SITE.cvPath} download>
+          <span class="bracket bracket-l" aria-hidden="true">[</span>
+          {t('nav.downloadCv').replace(/[[\]]/g, '').trim()}
+          <span class="bracket bracket-r" aria-hidden="true">]</span>
+        </a>
+        <ul class="mega-menu-socials">
+          <li><a href={SITE.github} rel="noopener" target="_blank">GitHub</a></li>
+          <li><a href={SITE.linkedin} rel="noopener" target="_blank">LinkedIn</a></li>
+          <li><a href={`mailto:${SITE.email}`}>Email</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .navbar {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 100;
+  }
+  .navbar-bar {
+    border-inline: none;
+    border-top: none;
+    border-radius: 0;
+  }
+  .navbar-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    transition: height var(--duration-hover) var(--ease-out-power3);
+  }
+
+  .navbar-links {
+    display: none;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  @media (min-width: 900px) {
+    .navbar-links {
+      display: flex;
+    }
+    .navbar-links--left {
+      justify-content: flex-end;
+    }
+  }
+  .navbar-link {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--duration-hover) ease;
+  }
+  .navbar-link:hover,
+  .navbar-link:focus-visible {
+    color: var(--color-accent);
+  }
+
+  /* Logo-moneda: grande, centrado, sobresale del borde inferior de la barra */
+  .navbar-logo {
+    position: absolute;
+    left: 50%;
+    top: 6px;
+    translate: -50% 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-soft);
+    box-shadow: var(--shadow-card);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    transition:
+      width var(--duration-hover) var(--ease-out-power3),
+      height var(--duration-hover) var(--ease-out-power3),
+      box-shadow var(--duration-hover) ease;
+  }
+  .navbar-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    scale: 1.06;
+  }
+  .navbar-logo:hover {
+    box-shadow: var(--shadow-glow);
+  }
+
+  :global(.navbar--compact) .navbar-inner {
+    height: 52px;
+  }
+  :global(.navbar--compact) .navbar-logo {
+    width: 44px;
+    height: 44px;
+    top: 4px;
+  }
+
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .navbar-lang {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    text-decoration: none;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.5rem;
+    transition:
+      color var(--duration-hover) ease,
+      border-color var(--duration-hover) ease;
+  }
+  .navbar-lang:hover,
+  .navbar-lang:focus-visible {
+    color: var(--color-accent);
+    border-color: var(--color-accent-dark);
+  }
+
+  .navbar-menu-btn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  .navbar-menu-icon,
+  .navbar-menu-icon::before,
+  .navbar-menu-icon::after {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: var(--color-text);
+    transition:
+      transform var(--duration-hover) var(--ease-out-power3),
+      opacity var(--duration-hover) ease;
+  }
+  .navbar-menu-icon::before,
+  .navbar-menu-icon::after {
+    content: '';
+    position: relative;
+  }
+  .navbar-menu-icon::before {
+    top: -6px;
+  }
+  .navbar-menu-icon::after {
+    top: 4.5px;
+  }
+  .navbar-menu-btn[aria-expanded='true'] .navbar-menu-icon {
+    background: transparent;
+  }
+  .navbar-menu-btn[aria-expanded='true'] .navbar-menu-icon::before {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .navbar-menu-btn[aria-expanded='true'] .navbar-menu-icon::after {
+    transform: translateY(-7.5px) rotate(-45deg);
+  }
+
+  /* ---------- Mega menu ---------- */
+  .mega-menu {
+    border-inline: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    background: rgb(10 15 15 / 0.85);
+  }
+  .mega-menu-grid {
+    display: grid;
+    gap: 2rem;
+    padding-block: 2rem;
+  }
+  @media (min-width: 900px) {
+    .mega-menu-grid {
+      grid-template-columns: 1fr auto;
+      gap: 4rem;
+      padding-block: 2.5rem;
+    }
+  }
+  .mega-menu-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+  }
+  @media (min-width: 700px) {
+    .mega-menu-links {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .mega-menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    color: var(--color-text);
+    text-decoration: none;
+    transition:
+      color var(--duration-hover) ease,
+      background-color var(--duration-hover) ease;
+  }
+  .mega-menu-link:hover,
+  .mega-menu-link:focus-visible {
+    color: var(--color-accent);
+    background: rgb(255 255 255 / 0.03);
+  }
+  .mega-menu-index {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent-dark);
+  }
+
+  .mega-menu-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+  .mega-menu-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    letter-spacing: 0.04em;
+  }
+  .badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3ddc84;
+    box-shadow: 0 0 8px rgb(61 220 132 / 0.7);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .badge-dot {
+      animation: none;
+    }
+  }
+  .mega-menu-socials {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1.25rem;
+  }
+  .mega-menu-socials a {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--duration-hover) ease;
+  }
+  .mega-menu-socials a:hover,
+  .mega-menu-socials a:focus-visible {
+    color: var(--color-accent);
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  import { prefersReducedMotion } from '../scripts/lifecycle';
+
+  // Delegación a nivel de documento: sobrevive a los swaps de View Transitions.
+  let open = false;
+
+  function els(): { menu: HTMLElement; btn: HTMLElement } | null {
+    const menu = document.querySelector<HTMLElement>('[data-mega-menu]');
+    const btn = document.querySelector<HTMLElement>('[data-menu-toggle]');
+    return menu && btn ? { menu, btn } : null;
+  }
+
+  function setOpen(next: boolean): void {
+    const found = els();
+    if (!found) return;
+    const { menu, btn } = found;
+    open = next;
+    btn.setAttribute('aria-expanded', String(next));
+
+    if (prefersReducedMotion()) {
+      menu.hidden = !next;
+      return;
+    }
+
+    if (next) {
+      menu.hidden = false;
+      gsap.fromTo(
+        menu,
+        { opacity: 0, y: -12 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' },
+      );
+      gsap.fromTo(
+        menu.querySelectorAll('li'),
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out', stagger: 0.06, delay: 0.05 },
+      );
+    } else {
+      gsap.to(menu, {
+        opacity: 0,
+        y: -12,
+        duration: 0.3,
+        ease: 'power2.in',
+        onComplete: () => {
+          menu.hidden = true;
+        },
+      });
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element;
+    if (target.closest('[data-menu-toggle]')) {
+      setOpen(!open);
+      return;
+    }
+    if (target.closest('[data-menu-close]') || (open && !target.closest('[data-mega-menu]'))) {
+      setOpen(false);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && open) {
+      setOpen(false);
+      (document.querySelector('[data-menu-toggle]') as HTMLElement | null)?.focus();
+    }
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    open = false;
+  });
+</script>

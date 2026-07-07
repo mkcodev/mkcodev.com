@@ -1,0 +1,104 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '@fontsource-variable/space-grotesk';
+import '@fontsource-variable/jetbrains-mono';
+import spaceGroteskUrl from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+import jetbrainsMonoUrl from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+
+import '../styles/global.css';
+import { SITE, SITE_URL, type Lang } from '../data/site';
+import { hreflangPair } from '../i18n/routes';
+import { useTranslations } from '../i18n/ui';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  ogImage?: string;
+  noIndex?: boolean;
+}
+
+const { lang, title, description, ogImage = SITE.ogImage, noIndex = false } = Astro.props;
+const t = useTranslations(lang);
+
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const canonical = new URL(path === '/' ? '/' : path, SITE_URL).href;
+const pair = hreflangPair(path);
+const ogImageAbs = new URL(ogImage, SITE_URL).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#person`,
+      name: SITE.author,
+      alternateName: SITE.name,
+      jobTitle: 'Full Stack Developer',
+      email: `mailto:${SITE.email}`,
+      url: SITE_URL,
+      sameAs: [SITE.github, SITE.linkedin],
+      address: { '@type': 'PostalAddress', addressLocality: 'Bilbao', addressCountry: 'ES' },
+      knowsAbout: ['React', 'Next.js', 'Astro', 'TypeScript', 'SEO', 'Web Performance', 'Python', 'Flask'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      name: SITE.name,
+      url: SITE_URL,
+      inLanguage: lang === 'es' ? 'es-ES' : 'en-US',
+      author: { '@id': `${SITE_URL}/#person` },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.author} />
+    <meta name="theme-color" content={SITE.themeColor} />
+    {noIndex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={new URL(pair.es, SITE_URL).href} />
+    <link rel="alternate" hreflang="en" href={new URL(pair.en, SITE_URL).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL(pair.es, SITE_URL).href} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preload" href={spaceGroteskUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={jetbrainsMonoUrl} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageAbs} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageAbs} />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <ClientRouter />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">{t('skip.content')}</a>
+    <Navbar lang={lang} />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <script src="../scripts/app.ts"></script>
+  </body>
+</html>

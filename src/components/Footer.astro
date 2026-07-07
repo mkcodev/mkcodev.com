@@ -1,0 +1,112 @@
+---
+import { SITE, type Lang } from '../data/site';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container-site footer-grid">
+    <div class="footer-col">
+      <p class="footer-brand">mkcodev<span class="footer-cursor" aria-hidden="true">_</span></p>
+      <p class="footer-meta">
+        © {year} · {SITE.author} · Bilbao
+      </p>
+    </div>
+
+    <ul class="footer-links">
+      <li><a href={SITE.github} rel="noopener" target="_blank">GitHub</a></li>
+      <li><a href={SITE.linkedin} rel="noopener" target="_blank">LinkedIn</a></li>
+      <li><a href={`mailto:${SITE.email}`}>Email</a></li>
+      <li><a href="/resume.json" data-astro-reload>{t('footer.machineReadable')}</a></li>
+    </ul>
+
+    <div class="footer-col footer-col--right">
+      <p class="footer-meta" data-footer-build>{t('footer.builtWith')}</p>
+      <p class="footer-hint">{t('footer.hint')}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border-soft);
+    padding-block: 2.5rem;
+    margin-top: clamp(4rem, 10vw, 7.5rem);
+  }
+  .footer-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 900px) {
+    .footer-grid {
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+  }
+  .footer-brand {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-body);
+    color: var(--color-text);
+  }
+  .footer-cursor {
+    color: var(--color-accent);
+    animation: blink 1.2s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .footer-cursor {
+      animation: none;
+    }
+  }
+  .footer-meta {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+  .footer-links a {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--duration-hover) ease;
+  }
+  .footer-links a:hover,
+  .footer-links a:focus-visible {
+    color: var(--color-accent);
+  }
+  .footer-col--right {
+    text-align: left;
+  }
+  @media (min-width: 900px) {
+    .footer-col--right {
+      text-align: right;
+    }
+  }
+  .footer-hint {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--color-ink-deep);
+  }
+</style>

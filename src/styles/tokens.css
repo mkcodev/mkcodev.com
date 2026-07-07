@@ -1,0 +1,79 @@
+/* ============================================================
+   TOKENS — única fuente de verdad de diseño.
+   Cero valores arbitrarios fuera de este archivo.
+   ============================================================ */
+@import 'tailwindcss';
+
+@theme {
+  /* -------- Colores -------- */
+  --color-accent: #00dbd5;
+  --color-accent-dark: #019390;
+  --color-ink-deep: #005855;
+  --color-bg: #0a0f0f;
+  --color-surface: #0e1515;
+  --color-surface-2: #131c1c;
+  --color-text: #e6e6e6;
+  --color-muted: #9b9b9b;
+  --color-white: #ffffff;
+
+  /* Bordes hairline (blanco a baja opacidad) */
+  --color-border-soft: rgb(255 255 255 / 0.08);
+  --color-border-strong: rgb(255 255 255 / 0.15);
+
+  /* -------- Tipografía -------- */
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk Fallback', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono Fallback', monospace;
+
+  /* Escala fluida */
+  --text-display: clamp(2.75rem, 7vw, 5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.03em;
+  --text-h2: clamp(1.875rem, 4vw, 3rem);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h3: clamp(1.25rem, 2vw, 1.5rem);
+  --text-h3--line-height: 1.25;
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.6;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.5;
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1.4;
+
+  /* -------- Radius: 8px small, 10px cards MAX -------- */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+
+  /* -------- Motion (espejo de GSAP en CSS) -------- */
+  --ease-out-power3: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-power2: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  --duration-hover: 250ms;
+  --duration-exit: 400ms;
+  --duration-enter: 700ms;
+
+  /* -------- Glow -------- */
+  --shadow-glow: 0 0 24px rgb(0 219 213 / 0.22), 0 0 6px rgb(0 219 213 / 0.14);
+  --shadow-glow-strong: 0 0 40px rgb(0 219 213 / 0.35), 0 0 12px rgb(0 219 213 / 0.25);
+  --shadow-card: 0 12px 32px rgb(0 0 0 / 0.35);
+}
+
+/* Fallbacks con métricas ajustadas — protegen marca Y CLS con font-display: swap.
+   Decisión registrada en CLAUDE.md (enmienda de fuentes). */
+@font-face {
+  font-family: 'Space Grotesk Fallback';
+  src: local('Arial');
+  size-adjust: 101%;
+  ascent-override: 98%;
+  descent-override: 29%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Courier New');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}

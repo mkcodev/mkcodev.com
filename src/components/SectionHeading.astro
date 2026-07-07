@@ -1,0 +1,31 @@
+---
+interface Props {
+  marker: string;
+  title: string;
+  id?: string;
+}
+
+const { marker, title, id } = Astro.props;
+---
+
+<div class="section-heading" data-animate="section-heading">
+  <p class="section-marker" data-animate-marker>{marker}</p>
+  <h2 id={id} class="section-title" data-animate-title>{title}</h2>
+</div>
+
+<style>
+  .section-heading {
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .section-marker {
+    margin: 0 0 0.75rem;
+  }
+  .section-title {
+    margin: 0;
+    font-size: var(--text-h2);
+    font-weight: 700;
+    letter-spacing: var(--text-h2--letter-spacing);
+    line-height: var(--text-h2--line-height);
+    color: var(--color-white);
+  }
+</style>
