@@ -60,6 +60,9 @@ export function startLifecycle(): void {
   if (document.readyState !== 'loading') handlePageLoad();
 }
 
+/** Utilidad disponible pero NO usada — decisión de producto en CLAUDE.md
+ *  (el portfolio ignora prefers-reduced-motion). Se mantiene por si en el
+ *  futuro se ofrece un toggle manual "reduce motion" en ⌘K / localStorage. */
 export function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }

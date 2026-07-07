@@ -60,8 +60,6 @@ const home = lang === 'es' ? '/' : '/en';
 </section>
 
 <script>
-  import { prefersReducedMotion } from '../../scripts/lifecycle';
-
   const BOOT_TEXT = 'init mkcodev v1.0 ... ok';
   const CHAR_MS = 18;
 
@@ -72,7 +70,7 @@ const home = lang === 'es' ? '/' : '/en';
     } catch {
       /* sin storage: el boot simplemente se repetirá */
     }
-    if (textEl && !prefersReducedMotion()) {
+    if (textEl) {
       for (let i = 1; i <= BOOT_TEXT.length; i++) {
         textEl.textContent = BOOT_TEXT.slice(0, i);
         await new Promise((r) => setTimeout(r, CHAR_MS));
@@ -129,12 +127,6 @@ const home = lang === 'es' ? '/' : '/en';
       opacity: 0;
     }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .boot-caret {
-      animation: none;
-    }
-  }
-
   .hero {
     position: relative;
     min-height: 92dvh;

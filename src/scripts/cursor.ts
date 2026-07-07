@@ -1,10 +1,7 @@
-import { prefersReducedMotion } from './lifecycle';
-
 const INTERACTIVE = 'a, button, [role="button"], input, textarea, [data-magnetic]';
 
-/** Cursor custom dot + ring. Solo desktop con puntero fino y sin reduced-motion. */
+/** Cursor custom dot + ring. Solo desktop con puntero fino. */
 export function initCursor(): (() => void) | void {
-  if (prefersReducedMotion()) return;
   if (!window.matchMedia('(pointer: fine)').matches) return;
 
   const dot = document.createElement('div');

@@ -1,6 +1,5 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { prefersReducedMotion } from './lifecycle';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,8 +12,6 @@ const TOGGLE = 'play reverse play reverse';
  * Los estados iniciales se fijan desde JS: sin JS el contenido es visible.
  */
 export function initReveals(): (() => void) | void {
-  if (prefersReducedMotion()) return;
-
   const ctx = gsap.context(() => {
     document.querySelectorAll<HTMLElement>('[data-animate="section-heading"]').forEach((el) => {
       const marker = el.querySelector('[data-animate-marker]');

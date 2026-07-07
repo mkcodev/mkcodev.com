@@ -1,5 +1,3 @@
-import { prefersReducedMotion } from './lifecycle';
-
 const STRENGTH = 0.35;
 const LERP = 0.18;
 
@@ -42,10 +40,9 @@ function attach(el: HTMLElement): () => void {
   };
 }
 
-/** Links magnéticos [data-magnetic] — solo pointer fine y sin reduced-motion. */
+/** Links magnéticos [data-magnetic] — solo pointer fine. */
 export function initMagnetic(): (() => void) | void {
   if (!window.matchMedia('(pointer: fine)').matches) return;
-  if (prefersReducedMotion()) return;
   const els = document.querySelectorAll<HTMLElement>('[data-magnetic]');
   if (els.length === 0) return;
   const cleanups = Array.from(els, attach);

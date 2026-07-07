@@ -226,10 +226,6 @@ export default function Terminal({ lang }: Props) {
       ]);
       setReady(true);
     };
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      finishIntro();
-      return;
-    }
     let i = 0;
     const id = window.setInterval(() => {
       i += 1;

@@ -170,12 +170,6 @@
     opacity: 0;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .term-caret {
-    animation: none;
-  }
-}
-
 @media (max-width: 480px) {
   .term {
     height: 360px;

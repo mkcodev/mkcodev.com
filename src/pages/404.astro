@@ -40,7 +40,6 @@ const lang = 'es' as const;
   const type = () => {
     const el = document.querySelector<HTMLElement>('[data-nf-type]');
     if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const full = el.textContent ?? '';
     el.textContent = '';
     let i = 0;
@@ -89,11 +88,6 @@ const lang = 'es' as const;
   @keyframes nf-blink {
     50% {
       opacity: 0;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .nf-caret {
-      animation: none;
     }
   }
   .nf-code {

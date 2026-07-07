@@ -1,6 +1,5 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { prefersReducedMotion } from './lifecycle';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -225,8 +224,6 @@ function initClaudeLoop(grid: HTMLElement): Cleanup {
 export function initBento(): (() => void) | void {
   const grid = document.querySelector<HTMLElement>('[data-bento]');
   if (!grid) return;
-  // Reduced motion: el markup ya contiene los estados finales de cada demo.
-  if (prefersReducedMotion()) return;
 
   const cleanups: Cleanup[] = [];
   const ctx = gsap.context(() => {

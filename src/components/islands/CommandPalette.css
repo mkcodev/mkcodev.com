@@ -34,13 +34,6 @@
     transform: scale(0.98);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .cp-backdrop,
-  .cp {
-    animation: none;
-  }
-}
-
 .cp-input-row {
   display: flex;
   align-items: center;

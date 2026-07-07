@@ -79,7 +79,7 @@ export function initTimeline(): (() => void) | void {
   if (!wrap) return;
 
   const mm = gsap.matchMedia();
-  mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => buildScrub(wrap));
-  mm.add('(max-width: 767px) and (prefers-reduced-motion: no-preference)', () => buildMobile(wrap));
+  mm.add('(min-width: 768px)', () => buildScrub(wrap));
+  mm.add('(max-width: 767px)', () => buildMobile(wrap));
   return () => mm.revert();
 }

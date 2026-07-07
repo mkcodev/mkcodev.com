@@ -1,5 +1,3 @@
-import { prefersReducedMotion } from './lifecycle';
-
 const LERP = 0.1;
 const FOLLOW = 0.55;
 
@@ -8,7 +6,7 @@ export function initHeroGlow(): (() => void) | void {
   const hero = document.querySelector<HTMLElement>('[data-hero]');
   const glow = document.querySelector<HTMLElement>('[data-hero-glow]');
   if (!hero || !glow) return;
-  if (prefersReducedMotion() || !window.matchMedia('(pointer: fine)').matches) return;
+  if (!window.matchMedia('(pointer: fine)').matches) return;
 
   let targetX = 0;
   let targetY = 0;

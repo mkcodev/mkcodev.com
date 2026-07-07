@@ -2,8 +2,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 
-import { prefersReducedMotion } from './lifecycle';
-
 gsap.registerPlugin(ScrollTrigger);
 
 /** Instancia viva de Lenis para scroll programático (nunca window.scrollTo). */
@@ -20,10 +18,6 @@ export function scrollToTarget(target: string | HTMLElement): void {
 
 /** Lenis + ScrollTrigger integrados. Cleanup total en cada swap de página. */
 export function initScroll(): () => void {
-  if (prefersReducedMotion()) {
-    return () => ScrollTrigger.getAll().forEach((t) => t.kill());
-  }
-
   const instance = new Lenis({ autoRaf: false });
   lenis = instance;
 

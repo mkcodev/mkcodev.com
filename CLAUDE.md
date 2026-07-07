@@ -6,7 +6,7 @@ Portfolio de Mikel Salvador García (mkcodev). Astro 7 + TS strict + Tailwind v4
 
 - **Cero valores Tailwind arbitrarios** (`w-[347px]`). Todo sale de `src/styles/tokens.css`. One-offs justificados se documentan aquí.
 - **Glass SOLO en**: navbar, mega menu, celdas bento, ⌘K, modals → utility `.glass`. Cards de proyecto = surface sólida + hairline border.
-- **Animar solo** `transform`/`opacity`/`filter`. `will-change` quirúrgico. `prefers-reduced-motion` colapsa todo a fades.
+- **Animar solo** `transform`/`opacity`/`filter`. `will-change` quirúrgico. **`prefers-reduced-motion` se ignora intencionadamente** (ver decisión #14) — no añadir la media query ni checks a `prefersReducedMotion()` en código nuevo.
 - **Acento con disciplina**: prompts, CTAs, glows, estados activos. Si todo brilla, nada brilla.
 - **Proyectos**: solo los 6 reales de `src/data/projects.ts`. Métricas reales o `[PENDIENTE]`, nunca inventadas.
 - Radius máx 10px (cards). Fuentes: Space Grotesk (display) + JetBrains Mono (terminal/labels/números).
@@ -56,6 +56,7 @@ Tokens GSAP: entradas `power3.out 0.6–0.9s` · salidas `power2.in 0.4s` · hov
 11. **Subset de símbolos** `public/fonts/jbm-symbols.woff2` (8 KB): glifos box-drawing/bloques/flechas/checks del ASCII art, ausentes de los subsets latin de fontsource. Cara `unicode-range` en tokens.css. Regenerar con `scripts/subset-symbols.mjs` (instrucciones en su cabecera) si el ASCII art usa rangos nuevos.
 12. **GSAP en scripts de componente**: import dinámico (`await import('gsap')`) dentro del handler, no import estático — evita meter GSAP en el bundle inicial de la página (ver Navbar.astro).
 13. **Lighthouse local es ruidoso**: en esta máquina, runs individuales dan falsos negativos (CLS/robots flaky, layout ±40%). Medir siempre 2-3 runs y quedarse con la mediana. Techo medido v1: mobile 61 / desktop 85 (93 sin boot overlay) — TBT mobile está dominado por layout/shaping del DOM SSR bajo throttle 4x, no por JS. `content-visibility: auto` probado y descartado (empeoró layout).
+14. **Ignorar `prefers-reduced-motion` (decisión de producto)**: el portfolio muestra sus animaciones siempre. Es SU showcase — Windows con "Efectos de animación" OFF activa la media query y mata todo, y Mikel prefiere activarlas en su sistema antes que ver un portfolio muerto. **No añadir** `@media (prefers-reduced-motion: reduce)` ni checks `prefersReducedMotion()` en código nuevo. La función `prefersReducedMotion()` en `src/scripts/lifecycle.ts` se mantiene exportada por si en el futuro se ofrece un opt-in manual (toggle en ⌘K + localStorage), pero HOY nada la consume. Historia: se probó "reduced-motion como modo de primera clase" y luego "reduced-motion pero con feedback" — ambos rompían el hover lift (transform no en la allowlist de `transition-property`). Cerrado.
 
 ## Entorno (Windows)
 
@@ -73,6 +74,6 @@ Tokens GSAP: entradas `power3.out 0.6–0.9s` · salidas `power2.in 0.4s` · hov
 
 1. Screenshot 1440px Y 390px, mirarlos.
 2. Estados interactivos con Playwright: hover cards/bento, mega menu abierto, ⌘K abierto, terminal tras comando.
-3. **OJO**: `scripts/screenshot.mjs` emula `reducedMotion: 'reduce'` (para captar todo el contenido) — eso OCULTA bugs de animación. Los hovers/reveals se verifican con `reducedMotion: 'no-preference'`. Bug histórico: el transform inline residual de GSAP tras un reveal pisa los `:hover` CSS → siempre `clearProps: 'transform'` en `onComplete` si el elemento tiene hover con transform.
-4. Reduced motion es un modo de primera clase (Windows "Efectos de animación" off lo activa): sin movimiento pero CON feedback — global.css limita `transition-property` a opacidad/color/borde con 150ms, nunca `transition: none` global.
+3. **Bug histórico** (ya no aplica pero conviene conocerlo): GSAP dejaba `transform` inline residual tras el reveal y pisaba los `:hover` CSS. Fix: `clearProps: 'transform'` en `onComplete` del reveal. Mantener el patrón en scripts nuevos que animen elementos con hover propio.
+4. Los scripts `scripts/*.mjs` emulan `reducedMotion: 'reduce'` en Playwright para captar contenido en fullPage. Como el sitio ignora esa media query (decisión #14), ya no oculta bugs — pero al añadir tests interactivos nuevos, forzar `reducedMotion: 'no-preference'` es más natural.
 5. Commit por sección (conventional commits).
