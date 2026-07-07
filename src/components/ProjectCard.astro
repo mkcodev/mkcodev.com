@@ -108,7 +108,8 @@ const href = lang === 'es' ? `/proyectos/${project.slug}` : `/en/projects/${proj
     margin: 0.25rem 0 0;
     padding: 0;
     list-style: none;
-    opacity: 0.6;
+    /* 0.75 mínimo: con 0.6 el cian mezclado baja de 4.5:1 (AA) */
+    opacity: 0.75;
     transition: opacity var(--duration-hover) ease;
   }
   .proj-card:hover .proj-card-stack {
