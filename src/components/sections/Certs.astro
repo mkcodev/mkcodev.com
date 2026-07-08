@@ -1,46 +1,105 @@
 ---
 import SectionHeading from '../SectionHeading.astro';
-import { useTranslations } from '../../i18n/ui';
-import { certs } from '../../data/certs';
+import { certs, type Cert } from '../../data/certs';
 import type { Lang } from '../../data/site';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const t = useTranslations(lang);
+
+/** Normaliza emisor a slug para etiqueta // xxx en label mono. */
+function issuerKey(issuer: string): string {
+  const base = issuer.split('—')[0]?.trim() ?? issuer;
+  return base.toLowerCase().replace(/\s+/g, '_');
+}
+
+const isFlagship = (c: Cert): boolean => c.name.includes('360h');
+
+// Flagship primero + resto agrupado por emisor manteniendo el orden original.
+const flagship = certs.find(isFlagship);
+const rest = certs.filter((c) => !isFlagship(c));
+const groups = new Map<string, Cert[]>();
+for (const c of rest) {
+  const key = issuerKey(c.issuer);
+  if (!groups.has(key)) groups.set(key, []);
+  groups.get(key)!.push(c);
+}
+const flagshipTag = lang === 'es' ? '[flagship]' : '[flagship]';
+const markerCount = `$ ls certs/ | wc -l → ${certs.length}`;
 ---
 
 <section id="certificaciones" class="container-site section-block">
-  <SectionHeading
-    marker={t('section.certs')}
-    title={lang === 'es' ? 'Certificaciones' : 'Certifications'}
-  />
+  <SectionHeading marker={markerCount} title={lang === 'es' ? 'Certificaciones' : 'Certifications'} />
 
-  <ul class="certs-grid" data-reveal-group>
-    {
-      certs.map((c) => (
-        <li class="cert" data-reveal>
+  {
+    flagship && (
+      <div class="certs-flagship" data-reveal-group>
+        <article class="cert cert--flagship" data-reveal>
+          <span class="cert-tag" aria-hidden="true">
+            {flagshipTag}
+          </span>
           <div class="cert-head">
-            <h3 class="cert-name">{c.name}</h3>
-            {c.year && <span class="cert-year">{c.year}</span>}
+            <h3 class="cert-name">{flagship.name}</h3>
+            {flagship.year && <span class="cert-year">{flagship.year}</span>}
           </div>
-          <p class="cert-issuer">{c.issuer}</p>
-          {c.verifyUrl && (
-            <a class="cert-verify" href={c.verifyUrl} rel="noopener" target="_blank">
+          <p class="cert-issuer">{flagship.issuer}</p>
+          {flagship.verifyUrl && (
+            <a class="cert-verify" href={flagship.verifyUrl} rel="noopener" target="_blank">
               {lang === 'es' ? 'verificar' : 'verify'} ↗
             </a>
           )}
-          {c.inProgress && c.note && <span class="cert-badge">{c.note[lang]}</span>}
-        </li>
-      ))
-    }
-  </ul>
+        </article>
+      </div>
+    )
+  }
+
+  {
+    Array.from(groups.entries()).map(([key, items]) => (
+      <div class="certs-group">
+        <p class="certs-group-label" aria-hidden="true">
+          // {key}
+        </p>
+        <ul class="certs-grid" data-reveal-group>
+          {items.map((c) => (
+            <li class="cert" data-reveal>
+              <div class="cert-head">
+                <h3 class="cert-name">{c.name}</h3>
+                {c.year && <span class="cert-year">{c.year}</span>}
+              </div>
+              <p class="cert-issuer">{c.issuer}</p>
+              {c.verifyUrl && (
+                <a class="cert-verify" href={c.verifyUrl} rel="noopener" target="_blank">
+                  {lang === 'es' ? 'verificar' : 'verify'} ↗
+                </a>
+              )}
+              {c.inProgress && c.note && <span class="cert-badge">{c.note[lang]}</span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
 </section>
 
 <style>
   .section-block {
     padding-block: clamp(4rem, 10vw, 7.5rem) 0;
+  }
+
+  .certs-flagship {
+    margin-bottom: 2.5rem;
+  }
+  .certs-group + .certs-group {
+    margin-top: 2rem;
+  }
+  .certs-group-label {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
   .certs-grid {
@@ -69,13 +128,33 @@ const t = useTranslations(lang);
     border: 1px solid var(--color-border-soft);
     border-radius: var(--radius-md);
     transition:
+      transform var(--duration-hover) var(--ease-out-power3),
       border-color var(--duration-hover) ease,
       box-shadow var(--duration-hover) ease;
   }
   .cert:hover,
   .cert:focus-within {
+    transform: translateY(-2px);
     border-color: var(--color-border-strong);
     box-shadow: var(--shadow-card);
+  }
+
+  .cert--flagship {
+    padding: 1.5rem 1.75rem;
+    border-color: var(--color-border-strong);
+    background: linear-gradient(135deg, var(--color-surface), var(--color-surface-2));
+  }
+  .cert-tag {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-dark);
+    border-radius: var(--radius-sm);
+    background: rgb(0 219 213 / 0.06);
   }
 
   .cert-head {
@@ -90,9 +169,16 @@ const t = useTranslations(lang);
     font-weight: 600;
     color: var(--color-white);
   }
+  .cert--flagship .cert-name {
+    font-size: var(--text-h3);
+  }
   .cert-year {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
+    color: var(--color-ink-deep);
+    transition: color var(--duration-hover) ease;
+  }
+  .cert:hover .cert-year {
     color: var(--color-muted);
   }
   .cert-issuer {

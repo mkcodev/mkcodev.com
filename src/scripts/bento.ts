@@ -220,6 +220,38 @@ function initClaudeLoop(grid: HTMLElement): Cleanup {
   });
 }
 
+/**
+ * Spotlight radial 1:1 con el cursor (pointer fine): un pointermove por
+ * grid actualiza --mx/--my de cada celda con coords locales. is-lit
+ * enciende el opacity de los ::before/::after (P6 spec).
+ */
+function initSpotlight(grid: HTMLElement): Cleanup {
+  if (!window.matchMedia('(pointer: fine)').matches) return () => {};
+  const cells = Array.from(grid.querySelectorAll<HTMLElement>('[data-bento-cell]'));
+  if (cells.length === 0) return () => {};
+
+  const onMove = (e: PointerEvent): void => {
+    for (const cell of cells) {
+      const r = cell.getBoundingClientRect();
+      cell.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      cell.style.setProperty('--my', `${e.clientY - r.top}px`);
+    }
+  };
+  const enter = (): void => grid.classList.add('is-lit');
+  const leave = (): void => grid.classList.remove('is-lit');
+
+  grid.addEventListener('pointermove', onMove);
+  grid.addEventListener('pointerenter', enter);
+  grid.addEventListener('pointerleave', leave);
+
+  return () => {
+    grid.removeEventListener('pointermove', onMove);
+    grid.removeEventListener('pointerenter', enter);
+    grid.removeEventListener('pointerleave', leave);
+    grid.classList.remove('is-lit');
+  };
+}
+
 /** Bento "cómo trabajo": entrada scale 0.96→1 stagger 0.1 + 6 mini-demos vivas. */
 export function initBento(): (() => void) | void {
   const grid = document.querySelector<HTMLElement>('[data-bento]');
@@ -243,6 +275,12 @@ export function initBento(): (() => void) | void {
     initGitGraph(grid);
   }, grid);
   cleanups.push(() => ctx.revert());
-  cleanups.push(initTermLoop(grid), initKeysDemo(grid), initDotfiles(grid), initClaudeLoop(grid));
+  cleanups.push(
+    initTermLoop(grid),
+    initKeysDemo(grid),
+    initDotfiles(grid),
+    initClaudeLoop(grid),
+    initSpotlight(grid),
+  );
   return () => cleanups.forEach((fn) => fn());
 }

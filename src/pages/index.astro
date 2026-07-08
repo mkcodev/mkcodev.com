@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hero from '../components/sections/Hero.astro';
+import StackMarquee from '../components/StackMarquee.astro';
+import Constellation from '../components/Constellation.astro';
 import Projects from '../components/sections/Projects.astro';
 import Bento from '../components/sections/Bento.astro';
 import Timeline from '../components/sections/Timeline.astro';
@@ -15,6 +17,10 @@ const t = useTranslations(lang);
 
 <Base lang={lang} title={t('meta.home.title')} description={t('meta.home.description')}>
   <Hero lang={lang} />
+
+  <StackMarquee />
+
+  <Constellation lang={lang} />
 
   <Projects lang={lang} />
 

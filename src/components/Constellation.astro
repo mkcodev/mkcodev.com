@@ -1,0 +1,157 @@
+---
+/**
+ * Constellation graph: 6 nodos (1 por proyecto) conectados por líneas SVG
+ * que se dibujan por scroll (scrub via ScrollTrigger). Cierra el hueco
+ * visual entre Hero y Proyectos con contenido de marca.
+ */
+import { projects } from '../data/projects';
+import type { Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Posiciones fijas en el viewBox 100x100 (SVG con preserveAspectRatio meet).
+// Ordenadas para formar una constelación aproximada — no simétrica a
+// propósito para evitar la lectura de "hexágono".
+const positions: Array<{ x: number; y: number }> = [
+  { x: 22, y: 32 },
+  { x: 50, y: 18 },
+  { x: 78, y: 28 },
+  { x: 32, y: 68 },
+  { x: 62, y: 72 },
+  { x: 88, y: 58 },
+];
+
+// Aristas: pares de índices que conectamos con línea.
+const edges: Array<[number, number]> = [
+  [0, 1],
+  [1, 2],
+  [0, 3],
+  [1, 4],
+  [2, 5],
+  [3, 4],
+  [4, 5],
+];
+
+const heading = lang === 'es' ? 'proyectos' : 'projects';
+const sub =
+  lang === 'es'
+    ? '6 proyectos · una historia'
+    : '6 projects · one story';
+---
+
+<section class="constellation" aria-hidden="true" data-constellation>
+  <div class="container-site const-inner">
+    <p class="const-label">// {heading}.constellation</p>
+    <p class="const-sub">{sub}</p>
+    <svg
+      class="const-svg"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+    >
+      {
+        edges.map(([a, b]) => {
+          const pa = positions[a]!;
+          const pb = positions[b]!;
+          return (
+            <line
+              class="const-edge"
+              data-const-edge
+              x1={pa.x}
+              y1={pa.y}
+              x2={pb.x}
+              y2={pb.y}
+              pathLength="1"
+            />
+          );
+        })
+      }
+      {
+        positions.map((p, i) => {
+          const proj = projects[i];
+          return (
+            <g class="const-node-wrap" data-const-node data-proj-slug={proj?.slug ?? ''}>
+              <circle class="const-node-halo" cx={p.x} cy={p.y} r="2.6" />
+              <circle class="const-node" cx={p.x} cy={p.y} r="1.1" />
+              <text
+                class="const-node-label"
+                x={p.x}
+                y={p.y - 3.6}
+                text-anchor="middle"
+              >
+                {proj?.title ?? ''}
+              </text>
+            </g>
+          );
+        })
+      }
+    </svg>
+  </div>
+</section>
+
+<style>
+  .constellation {
+    position: relative;
+    padding-block: clamp(2rem, 6vw, 4rem);
+    overflow: hidden;
+  }
+  .const-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .const-label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent-dark);
+  }
+  .const-sub {
+    margin: 0 0 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  .const-svg {
+    width: 100%;
+    height: clamp(180px, 26vw, 320px);
+    overflow: visible;
+  }
+  .const-edge {
+    stroke: var(--color-accent);
+    stroke-width: 0.15;
+    stroke-opacity: 0.55;
+    fill: none;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .const-node {
+    fill: var(--color-accent);
+    filter: drop-shadow(0 0 1.5px rgb(0 219 213 / 0.7));
+  }
+  .const-node-halo {
+    fill: rgb(0 219 213 / 0.1);
+    stroke: rgb(0 219 213 / 0.35);
+    stroke-width: 0.1;
+    opacity: 0;
+    transition: opacity var(--duration-hover) ease;
+  }
+  .const-node-wrap:hover .const-node-halo {
+    opacity: 1;
+  }
+  .const-node-label {
+    font-family: var(--font-mono);
+    font-size: 2.2px;
+    fill: var(--color-muted);
+    opacity: 0;
+    transition: opacity var(--duration-hover) ease;
+  }
+  .const-node-wrap:hover .const-node-label {
+    opacity: 1;
+  }
+</style>

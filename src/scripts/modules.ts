@@ -10,6 +10,7 @@ import { initGlyphTunnel } from './glyphTunnel';
 import { initScrollSkew } from './scrollSkew';
 import { initCursorTrail } from './cursorTrail';
 import { initReveals } from './reveal';
+import { initBlurReveal } from './blurReveal';
 import { initBento } from './bento';
 import { initTimeline } from './timeline';
 import { initProjectsCinema } from './projectsCinema';
@@ -19,6 +20,7 @@ import { initKeys } from './keys';
 import { initEggs } from './eggs';
 import { initCommentaryMode } from './commentaryMode';
 import { initCaseStudy } from './caseStudy';
+import { initConstellation } from './constellation';
 
 onPageLoad(initScroll);
 onPageLoad(initNavbar);
@@ -29,6 +31,7 @@ onPageLoad(initGlyphTunnel);
 onPageLoad(initScrollSkew);
 onPageLoad(initCursorTrail);
 onPageLoad(initReveals);
+onPageLoad(initBlurReveal);
 onPageLoad(initBento);
 onPageLoad(initTimeline);
 onPageLoad(initProjectsCinema);
@@ -38,6 +41,7 @@ onPageLoad(initKeys);
 onPageLoad(initEggs);
 onPageLoad(initCommentaryMode);
 onPageLoad(initCaseStudy);
+onPageLoad(initConstellation);
 
 // Los reveals se crean ANTES que el pin del timeline y se refrescan en orden
 // de creación: sin sort() el offset del pin no se propaga a los triggers

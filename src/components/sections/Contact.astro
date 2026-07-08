@@ -13,6 +13,7 @@ const lead =
   lang === 'es'
     ? '¿Un proyecto, una vacante o solo hablar de webs rápidas? Mi inbox compila.'
     : 'A project, a role, or just fast-websites talk? My inbox compiles.';
+const copyLabel = lang === 'es' ? 'copiado ✓' : 'copied ✓';
 ---
 
 <section id="contacto" class="container-site section-block">
@@ -25,17 +26,26 @@ const lead =
       <span class="contact-prompt">$</span> mail -s "hola" {SITE.email}
     </p>
 
-    <div class="contact-actions" data-reveal>
-      <a
-        class="btn-terminal btn-terminal--primary contact-mail"
-        href={`mailto:${SITE.email}`}
-        data-magnetic
-      >
-        <span class="bracket bracket-l">[</span>
-        {SITE.email}
-        <span class="bracket bracket-r">]</span>
-      </a>
-    </div>
+    <a
+      class="contact-mail"
+      href={`mailto:${SITE.email}`}
+      data-reveal
+      data-magnetic
+      data-contact-mail
+      aria-label={lang === 'es' ? `Enviar email a ${SITE.email}` : `Send email to ${SITE.email}`}
+    >
+      {SITE.email}
+    </a>
+
+    <p
+      class="contact-toast"
+      data-contact-toast
+      role="status"
+      aria-live="polite"
+      aria-hidden="true"
+    >
+      {copyLabel}
+    </p>
 
     <ul class="contact-links" data-reveal>
       <li>
@@ -52,6 +62,32 @@ const lead =
     </ul>
   </div>
 </section>
+
+<script>
+  // Copy-to-clipboard + toast al hacer click en el email gigante.
+  // No cancela el mailto: la copia se hace mientras el navegador abre el
+  // cliente por defecto. Delegación a nivel de documento para sobrevivir
+  // View Transitions.
+  document.addEventListener('click', (e) => {
+    const link = (e.target as Element).closest<HTMLAnchorElement>('[data-contact-mail]');
+    if (!link) return;
+    const href = link.getAttribute('href') ?? '';
+    const email = href.replace(/^mailto:/, '');
+    if (!email) return;
+    if (navigator.clipboard) {
+      void navigator.clipboard.writeText(email).catch(() => {});
+    }
+    const toast = document.querySelector<HTMLElement>('[data-contact-toast]');
+    if (toast) {
+      toast.dataset['visible'] = '1';
+      toast.setAttribute('aria-hidden', 'false');
+      setTimeout(() => {
+        delete toast.dataset['visible'];
+        toast.setAttribute('aria-hidden', 'true');
+      }, 2000);
+    }
+  });
+</script>
 
 <style>
   .section-block {
@@ -76,13 +112,64 @@ const lead =
     color: var(--color-accent);
   }
 
-  .contact-actions {
-    margin-bottom: 2rem;
-  }
+  /* Email como wordmark: display type, una línea, underline draw en hover. */
   .contact-mail {
-    font-size: var(--text-body);
-    padding: 0.875rem 1.5rem;
+    position: relative;
+    display: inline-block;
+    margin: 0.5rem 0 1.5rem;
+    max-width: 100%;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 6.5vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--color-text);
+    text-decoration: none;
+    overflow-wrap: anywhere;
     will-change: transform;
+    transition: color var(--duration-hover) ease;
+  }
+  .contact-mail::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.15em;
+    width: 100%;
+    height: 2px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s var(--ease-out-power3);
+  }
+  .contact-mail:hover,
+  .contact-mail:focus-visible {
+    color: var(--color-accent);
+  }
+  .contact-mail:hover::after,
+  .contact-mail:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .contact-toast {
+    margin: 0 0 1.5rem;
+    padding: 0.35rem 0.75rem;
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-dark);
+    border-radius: var(--radius-sm);
+    background: rgb(0 219 213 / 0.06);
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition:
+      opacity 0.25s var(--ease-out-power3),
+      transform 0.25s var(--ease-out-power3);
+  }
+  .contact-toast[data-visible='1'] {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .contact-links {

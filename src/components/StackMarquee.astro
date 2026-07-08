@@ -1,0 +1,114 @@
+---
+/**
+ * Marquee de stack full-width entre Hero y Proyectos. CSS puro: dos copias
+ * del contenido en un track flex, animación linear infinite. Mask lateral
+ * para fade en los bordes. Duplicado con aria-hidden.
+ */
+const STACK = [
+  'React',
+  'Next.js',
+  'Astro',
+  'TypeScript',
+  'Tailwind',
+  'GSAP',
+  'Node',
+  'pnpm',
+  'Arch',
+  'fish',
+] as const;
+---
+
+<div class="stack-marquee" aria-label="Stack técnico" role="marquee">
+  <div class="stack-track">
+    <ul class="stack-list">
+      {
+        STACK.map((item) => (
+          <li>
+            <span class="stack-item">{item}</span>
+            <span class="stack-sep" aria-hidden="true">
+              ·
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <ul class="stack-list" aria-hidden="true">
+      {
+        STACK.map((item) => (
+          <li>
+            <span class="stack-item">{item}</span>
+            <span class="stack-sep" aria-hidden="true">
+              ·
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+<style>
+  .stack-marquee {
+    position: relative;
+    width: 100%;
+    padding-block: 1.5rem;
+    border-block: 1px solid var(--color-border-soft);
+    overflow: hidden;
+    /* Fade lateral: los items desaparecen antes de tocar el borde de la
+       ventana para dar sensación de continuidad. */
+    mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  }
+  .stack-track {
+    display: flex;
+    width: max-content;
+    animation: stack-scroll 40s linear infinite;
+    will-change: transform;
+  }
+  .stack-marquee:hover .stack-track {
+    animation-play-state: paused;
+  }
+  .stack-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1.75rem;
+    padding-inline: 1rem;
+  }
+  .stack-list li {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    white-space: nowrap;
+    transition: color var(--duration-hover) ease;
+  }
+  .stack-marquee:hover .stack-list li {
+    color: var(--color-text);
+  }
+  .stack-sep {
+    color: var(--color-ink-deep);
+  }
+  @keyframes stack-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (max-width: 720px) {
+    .stack-track {
+      animation-duration: 28s;
+    }
+    .stack-list {
+      gap: 1.25rem;
+    }
+    .stack-list li {
+      gap: 1.25rem;
+      font-size: var(--text-xs);
+    }
+  }
+</style>

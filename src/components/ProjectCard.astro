@@ -60,6 +60,7 @@ const href = lang === 'es' ? `/proyectos/${project.slug}` : `/en/projects/${proj
   }
 
   .proj-card-media {
+    position: relative;
     aspect-ratio: 16 / 10;
     overflow: hidden;
     border-bottom: 1px solid var(--color-border-soft);
@@ -69,10 +70,29 @@ const href = lang === 'es' ? `/proyectos/${project.slug}` : `/en/projects/${proj
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform var(--duration-enter) var(--ease-out-power3);
+    filter: brightness(1.05) contrast(1.05);
+    /* Duración cinemática (más lenta que el resto de hovers) — la imagen
+       es el sujeto de la card y merece su propio ritmo. */
+    transition: transform 600ms var(--ease-out-power3);
   }
-  .proj-card:hover .proj-card-media img {
-    transform: scale(1.03);
+  /* Overlay inferior para que el año/título encima del media (si algún
+     día flotan) mantengan contraste; suave por defecto, sube en hover. */
+  .proj-card-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent 55%, rgb(10 15 15 / 0.55) 100%);
+    opacity: 0.7;
+    transition: opacity var(--duration-hover) ease;
+  }
+  .proj-card:hover .proj-card-media img,
+  .proj-card:focus-visible .proj-card-media img {
+    transform: scale(1.045);
+  }
+  .proj-card:hover .proj-card-media::after,
+  .proj-card:focus-visible .proj-card-media::after {
+    opacity: 0.4;
   }
 
   .proj-card-body {

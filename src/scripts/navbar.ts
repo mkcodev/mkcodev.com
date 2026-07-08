@@ -1,5 +1,8 @@
 const SECTION_IDS = ['proyectos', 'como-trabajo', 'trayectoria', 'sobre-mi', 'contacto'];
 
+/** Grados por píxel de scroll — 360° cada 1200 px (≈2 vueltas por página típica). */
+const SPIN_FACTOR = 0.3;
+
 function initSectionActive(navbar: HTMLElement): (() => void) | undefined {
   const links = new Map<string, HTMLElement>();
   navbar.querySelectorAll<HTMLElement>('.navbar-link').forEach((a) => {
@@ -41,21 +44,27 @@ function initSectionActive(navbar: HTMLElement): (() => void) | undefined {
 }
 
 /**
- * Navbar: altura fija (siempre "compacto"). Solo actualiza el progress ring
- * alrededor del logo y marca link activo por sección visible.
+ * Navbar: altura fija (siempre "compacto"). Actualiza el progress ring, el
+ * spin del logo proporcional al scroll y el link activo por sección visible.
  */
 export function initNavbar(): (() => void) | void {
   const navbar = document.querySelector<HTMLElement>('[data-navbar]');
   if (!navbar) return;
   const progress = navbar.querySelector<SVGCircleElement>('[data-nav-progress]');
+  const logo = navbar.querySelector<HTMLElement>('[data-nav-logo]');
 
   let ticking = false;
 
-  const applyProgress = (): void => {
-    if (!progress) return;
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-    progress.style.strokeDashoffset = String(1 - p);
+  const applyScroll = (): void => {
+    const y = window.scrollY;
+    if (progress) {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
+      progress.style.strokeDashoffset = String(1 - p);
+    }
+    if (logo) {
+      logo.style.transform = `rotate(${y * SPIN_FACTOR}deg)`;
+    }
   };
 
   const onScroll = (): void => {
@@ -63,11 +72,11 @@ export function initNavbar(): (() => void) | void {
     ticking = true;
     requestAnimationFrame(() => {
       ticking = false;
-      applyProgress();
+      applyScroll();
     });
   };
 
-  applyProgress();
+  applyScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
   const cleanupSections = initSectionActive(navbar);

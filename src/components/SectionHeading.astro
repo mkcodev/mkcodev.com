@@ -30,4 +30,20 @@ const { marker, title, id, animate = true } = Astro.props;
     line-height: var(--text-h2--line-height);
     color: var(--color-white);
   }
+  /* Word split reveal (reveal.ts wrapWords): cada palabra vive en
+     .mask (overflow hidden) y sube desde abajo con clip-path. inline-block
+     mantiene el flujo natural. `padding-bottom` da margen al descender de
+     letras (g, y, j) para que el clip no las corte. */
+  .section-title :global(.mask) {
+    display: inline-block;
+    overflow: hidden;
+    line-height: inherit;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+    vertical-align: bottom;
+  }
+  .section-title :global(.word) {
+    display: inline-block;
+    will-change: transform, clip-path;
+  }
 </style>

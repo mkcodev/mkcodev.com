@@ -27,23 +27,36 @@ const yearLabel = (year: string) => (year === 'ahora' ? (lang === 'es' ? 'ahora'
     <ol class="tl-commits">
       <span class="tl-line" data-tl-line aria-hidden="true"></span>
       {
-        timeline.map((c) => (
-          <li class="tl-row" data-tl-row>
-            <span
-              class:list={[
-                'tl-dot',
-                { 'tl-dot--merge': c.isMerge === true, 'tl-dot--head': c.isHead === true },
-              ]}
-              data-tl-dot
-              aria-hidden="true"
-            />
-            <div class="tl-text" data-tl-text>
-              <span class:list={['tl-hash', { 'tl-hash--head': c.isHead === true }]}>{c.hash}</span>
-              <span class="tl-msg">{c.message[lang]}</span>
-              <span class="tl-year">{yearLabel(c.year)}</span>
-            </div>
-          </li>
-        ))
+        timeline.map((c) => {
+          const rawMsg = c.message[lang];
+          const match = /^(feat|fix|refactor|chore|docs|perf|ci|test|release):\s*(.+)$/.exec(rawMsg);
+          const commitType = match?.[1] ?? '';
+          const commitRest = match?.[2] ?? rawMsg;
+          return (
+            <li class="tl-row" data-tl-row>
+              <span
+                class:list={[
+                  'tl-dot',
+                  { 'tl-dot--merge': c.isMerge === true, 'tl-dot--head': c.isHead === true },
+                ]}
+                data-tl-dot
+                aria-hidden="true"
+              />
+              <div class="tl-text" data-tl-text>
+                <span class:list={['tl-hash', { 'tl-hash--head': c.isHead === true }]}>
+                  {c.hash}
+                </span>
+                <span class="tl-msg">
+                  {commitType && (
+                    <span class:list={['tl-type', `tl-type--${commitType}`]}>{commitType}:</span>
+                  )}
+                  <span class="tl-msg-body">{commitRest}</span>
+                </span>
+                <span class="tl-year">{yearLabel(c.year)}</span>
+              </div>
+            </li>
+          );
+        })
       }
     </ol>
   </div>
@@ -97,6 +110,26 @@ const yearLabel = (year: string) => (year === 'ahora' ? (lang === 'es' ? 'ahora'
     grid-template-columns: 14px minmax(0, 1fr);
     column-gap: 1.25rem;
     align-items: center;
+    padding: 0.375rem 0.5rem 0.375rem 0;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--duration-hover) ease;
+  }
+  @media (pointer: fine) {
+    .tl-row:hover {
+      background: var(--color-surface);
+    }
+    .tl-row:hover .tl-hash:not(.tl-hash--head) {
+      color: var(--color-white);
+    }
+    .tl-row:hover .tl-year {
+      transform: translateX(-4px);
+      color: var(--color-text);
+    }
+    .tl-year {
+      transition:
+        transform var(--duration-hover) var(--ease-out-power3),
+        color var(--duration-hover) ease;
+    }
   }
   .tl-dot {
     position: relative;
@@ -156,6 +189,31 @@ const yearLabel = (year: string) => (year === 'ahora' ? (lang === 'es' ? 'ahora'
     font-weight: 700;
   }
   .tl-msg {
+    color: var(--color-text);
+    display: inline;
+  }
+  .tl-type {
+    margin-right: 0.35em;
+    font-weight: 600;
+  }
+  .tl-type--feat {
+    color: var(--color-accent);
+  }
+  .tl-type--fix {
+    color: #f4a261;
+  }
+  .tl-type--refactor,
+  .tl-type--chore,
+  .tl-type--docs,
+  .tl-type--ci,
+  .tl-type--test {
+    color: var(--color-muted);
+  }
+  .tl-type--perf,
+  .tl-type--release {
+    color: var(--color-accent-dark);
+  }
+  .tl-msg-body {
     color: var(--color-text);
   }
   .tl-year {

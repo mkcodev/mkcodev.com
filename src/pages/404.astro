@@ -14,21 +14,23 @@ const lang = 'es' as const;
     <div class="nf-term" role="presentation">
       <p class="nf-line">
         <span class="nf-prompt">$</span>
-        <span class="nf-cmd" data-nf-type>bash: page: command not found</span><span
+        <span class="nf-cmd" data-nf-type>fzweb page</span><span
           class="nf-caret"
+          data-nf-caret
           aria-hidden="true">▍</span
         >
       </p>
-      <p class="nf-code" aria-hidden="true">exit code: 404</p>
+      <p class="nf-error" data-nf-error aria-hidden="true">bash: fzweb: command not found</p>
+      <p class="nf-code" data-nf-code aria-hidden="true">exit code: 404</p>
     </div>
 
-    <h1 class="nf-title">404</h1>
-    <p class="nf-desc">
+    <h1 class="nf-title" data-nf-reveal>404</h1>
+    <p class="nf-desc" data-nf-reveal>
       La página que buscas no existe o se movió.
       <span class="nf-desc-en">/ The page you're looking for doesn't exist.</span>
     </p>
 
-    <a class="btn-terminal btn-terminal--primary" href="/">
+    <a class="btn-terminal btn-terminal--primary" href="/" data-nf-reveal>
       <span class="bracket bracket-l">[</span>
       cd ~
       <span class="bracket bracket-r">]</span>
@@ -37,20 +39,43 @@ const lang = 'es' as const;
 </Base>
 
 <script>
-  const type = () => {
-    const el = document.querySelector<HTMLElement>('[data-nf-type]');
-    if (!el) return;
-    const full = el.textContent ?? '';
-    el.textContent = '';
-    let i = 0;
-    const tick = () => {
-      if (!el.isConnected) return;
-      el.textContent = full.slice(0, ++i);
-      if (i < full.length) setTimeout(tick, 26);
-    };
-    setTimeout(tick, 300);
+  import { type } from '../scripts/typing';
+
+  const boot = (): void => {
+    const cmd = document.querySelector<HTMLElement>('[data-nf-type]');
+    const error = document.querySelector<HTMLElement>('[data-nf-error]');
+    const code = document.querySelector<HTMLElement>('[data-nf-code]');
+    const reveals = document.querySelectorAll<HTMLElement>('[data-nf-reveal]');
+    if (!cmd || !error || !code) return;
+
+    // Estado inicial: error/code invisibles hasta que termina el typing;
+    // reveals con opacity 0 + y para el stagger final.
+    error.style.opacity = '0';
+    code.style.opacity = '0';
+    reveals.forEach((el) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(16px)';
+      el.style.transition = 'opacity 0.5s var(--ease-out-power3), transform 0.5s var(--ease-out-power3)';
+    });
+
+    type(cmd, {
+      perChar: 40,
+      onDone: () => {
+        setTimeout(() => {
+          error.style.opacity = '1';
+          code.style.opacity = '1';
+          reveals.forEach((el, i) => {
+            setTimeout(() => {
+              el.style.opacity = '1';
+              el.style.transform = 'translateY(0)';
+            }, 120 + i * 80);
+          });
+        }, 300);
+      },
+    });
   };
-  document.addEventListener('astro:page-load', type);
+
+  document.addEventListener('astro:page-load', boot);
 </script>
 
 <style>
@@ -80,6 +105,7 @@ const lang = 'es' as const;
   }
   .nf-prompt {
     color: var(--color-accent);
+    margin-right: 0.4rem;
   }
   .nf-caret {
     color: var(--color-accent);
@@ -90,17 +116,25 @@ const lang = 'es' as const;
       opacity: 0;
     }
   }
+  .nf-error {
+    margin: 0.4rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: #ff6b6b;
+    transition: opacity 0.3s ease-out;
+  }
   .nf-code {
     margin: 0.5rem 0 0;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--color-muted);
+    transition: opacity 0.3s ease-out;
   }
 
   .nf-title {
     margin: 0 0 0.75rem;
-    font-size: var(--text-h1);
-    line-height: var(--text-h1--line-height);
+    font-size: var(--text-h1, clamp(3.5rem, 12vw, 6rem));
+    line-height: 1;
     letter-spacing: -0.04em;
     color: var(--color-white);
   }

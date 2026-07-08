@@ -198,6 +198,17 @@ body::after {
   border: 1px solid rgb(0 219 213 / 0.45);
   transition: border-color var(--duration-hover) ease;
 }
+
+/* Blur reveal por líneas (splitLines.ts + blurReveal.ts): la línea externa
+   recorta con overflow y la interna sube desde y:14 con blur→0. */
+[data-blur-lines] .line {
+  display: block;
+  overflow: hidden;
+}
+[data-blur-lines] .line-inner {
+  display: block;
+  will-change: transform, filter, opacity;
+}
 .cursor-ring--active {
   border-color: var(--color-accent);
 }

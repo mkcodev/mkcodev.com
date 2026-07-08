@@ -110,6 +110,7 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
     <span class="navbar-hairline" data-nav-hairline aria-hidden="true"></span>
   </nav>
 
+  <div class="mega-menu-backdrop" data-mega-backdrop aria-hidden="true"></div>
   <div class="mega-menu glass" id="mega-menu" data-mega-menu hidden>
     <div class="container-site mega-menu-grid">
       <ul class="mega-menu-links">
@@ -157,6 +158,12 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
        sin esto, el mega menu tapa el logo cuando abre porque va después
        en el DOM. */
     z-index: 2;
+    /* Empuja todo el bar 10px hacia abajo. Antes el offset vertical
+       vivía en .navbar-logo (margin-top) y solo desplazaba el coin,
+       dejando links + EN + menú 5px por encima de su centro. Con el
+       padding aquí, todos los items del grid se alinean vertical dentro
+       del mismo inner. */
+    padding-top: 10px;
     border-inline: none;
     border-top: none;
     border-radius: 0;
@@ -164,10 +171,18 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
   .navbar-inner {
     position: relative;
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    /* Móvil: logo a la izquierda, controles a la derecha, hueco flexible
+       en medio. Desktop (≥900px, ver media query más abajo) recupera el
+       layout 1fr auto 1fr con el coin centrado y los links a los lados. */
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 1rem;
     height: 60px;
+  }
+  @media (min-width: 900px) {
+    .navbar-inner {
+      grid-template-columns: 1fr auto 1fr;
+    }
   }
 
   .navbar-links {
@@ -270,10 +285,18 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
     place-items: center;
     overflow: visible;
     z-index: 2;
-    grid-column: 2;
-    justify-self: center;
+    /* Móvil: 1ª columna (izquierda). Desktop: columna central (coin
+       flotando en medio con los grupos de links a cada lado). */
+    grid-column: 1;
+    justify-self: start;
     margin-top: 10px;
     transition: filter var(--duration-hover) ease;
+  }
+  @media (min-width: 900px) {
+    .navbar-logo {
+      grid-column: 2;
+      justify-self: center;
+    }
   }
   .navbar-logo-face {
     position: absolute;
@@ -465,7 +488,27 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
   }
 
   /* ---------- Mega menu ---------- */
+  /* Backdrop: cubre TODA la ventana detrás del panel para que el H1 del
+     hero no compita con los links. Se activa vía data-open="1" desde el
+     mismo toggle del mega menu. */
+  .mega-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: rgb(10 15 15 / 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+  }
+  .mega-menu-backdrop[data-open='1'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
   .mega-menu {
+    position: relative;
+    z-index: 2;
     border-inline: none;
     border-radius: 0 0 var(--radius-md) var(--radius-md);
     background: rgb(10 15 15 / 0.85);
@@ -576,18 +619,20 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
   // Delegación a nivel de documento: sobrevive a los swaps de View Transitions.
   let open = false;
 
-  function els(): { menu: HTMLElement; btn: HTMLElement } | null {
+  function els(): { menu: HTMLElement; btn: HTMLElement; backdrop: HTMLElement | null } | null {
     const menu = document.querySelector<HTMLElement>('[data-mega-menu]');
     const btn = document.querySelector<HTMLElement>('[data-menu-toggle]');
-    return menu && btn ? { menu, btn } : null;
+    const backdrop = document.querySelector<HTMLElement>('[data-mega-backdrop]');
+    return menu && btn ? { menu, btn, backdrop } : null;
   }
 
   async function setOpen(next: boolean): Promise<void> {
     const found = els();
     if (!found) return;
-    const { menu, btn } = found;
+    const { menu, btn, backdrop } = found;
     open = next;
     btn.setAttribute('aria-expanded', String(next));
+    if (backdrop) backdrop.dataset['open'] = next ? '1' : '0';
 
     // Import dinámico: gsap no entra en el bundle eager del navbar (TBT).
     const { default: gsap } = await import('gsap');

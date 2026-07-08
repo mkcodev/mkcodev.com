@@ -15,8 +15,21 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lan
 const title = lang === 'es' ? 'Blog' : 'Blog';
 const emptyMsg =
   lang === 'es'
-    ? 'ls: nada por aquí todavía — escribiendo los primeros posts…'
-    : 'ls: nothing here yet — writing the first posts…';
+    ? 'tail -f posts.log — esperando primer post…'
+    : 'tail -f posts.log — waiting for first post…';
+const draftLabel = lang === 'es' ? '[borrador]' : '[draft]';
+const drafts =
+  lang === 'es'
+    ? [
+        'notas sobre la construcción de este portfolio en astro 7',
+        'auditar core web vitals sin lighthouse (a mano)',
+        'view transitions en vanilla + client router: patrones de lifecycle',
+      ]
+    : [
+        'notes on building this portfolio in astro 7',
+        'auditing core web vitals without lighthouse (by hand)',
+        'view transitions in vanilla + client router: lifecycle patterns',
+      ];
 const dateFmt = new Intl.DateTimeFormat(lang === 'es' ? 'es-ES' : 'en-US', {
   year: 'numeric',
   month: 'short',
@@ -31,11 +44,28 @@ const dateFmt = new Intl.DateTimeFormat(lang === 'es' ? 'es-ES' : 'en-US', {
     posts.length === 0 ? (
       <div class="blog-empty" data-reveal-group>
         <p class="blog-empty-cmd" data-reveal>
-          <span class="blog-prompt">$</span> ls ./posts
+          <span class="blog-prompt">$</span> tail -f posts.log
+          <span class="blog-caret" aria-hidden="true">
+            ▍
+          </span>
         </p>
         <p class="blog-empty-msg" data-reveal>
           {emptyMsg}
         </p>
+        <pre class="blog-ascii" aria-hidden="true" data-reveal>
+{`  ┌──────────────────────────────┐
+  │  waiting for writes…         │
+  │  ▸ src/content/blog/         │
+  └──────────────────────────────┘`}
+        </pre>
+        <ul class="blog-drafts" data-reveal>
+          {drafts.map((d) => (
+            <li class="blog-draft">
+              <span class="blog-draft-label">{draftLabel}</span>
+              <span class="blog-draft-title">{d}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     ) : (
       <ul class="blog-list" data-reveal-group>
@@ -63,6 +93,7 @@ const dateFmt = new Intl.DateTimeFormat(lang === 'es' ? 'es-ES' : 'en-US', {
 
   .blog-empty {
     font-family: var(--font-mono);
+    max-width: 640px;
   }
   .blog-empty-cmd {
     margin: 0 0 0.5rem;
@@ -71,11 +102,57 @@ const dateFmt = new Intl.DateTimeFormat(lang === 'es' ? 'es-ES' : 'en-US', {
   }
   .blog-prompt {
     color: var(--color-accent);
+    margin-right: 0.4rem;
+  }
+  .blog-caret {
+    color: var(--color-accent);
+    animation: blog-blink 1.1s steps(1) infinite;
+  }
+  @keyframes blog-blink {
+    50% {
+      opacity: 0;
+    }
   }
   .blog-empty-msg {
     margin: 0;
     font-size: var(--text-sm);
     color: var(--color-muted);
+  }
+  .blog-ascii {
+    margin: 1.5rem 0 2rem;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--color-ink-deep);
+    white-space: pre;
+    user-select: none;
+  }
+  .blog-drafts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .blog-draft {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-ink-deep);
+  }
+  .blog-draft-label {
+    color: var(--color-accent-dark);
+    font-size: var(--text-xs);
+    letter-spacing: 0.05em;
+  }
+  .blog-draft-title {
+    text-transform: lowercase;
   }
 
   .blog-list {

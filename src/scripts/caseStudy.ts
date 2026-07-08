@@ -67,19 +67,127 @@ function initLine(body: HTMLElement): void {
 }
 
 /**
+ * Entrada del case study: browser frame sube desde y:32 con opacity 0 y
+ * los chips del stack entran con stagger tras el título. Se dispara al
+ * cargar (post astro:page-load) porque el frame ya está en viewport.
+ */
+function initEntrance(): void {
+  const frame = document.querySelector<HTMLElement>('.cs-media');
+  const stack = document.querySelector<HTMLElement>('.cs-meta-stack');
+  const links = document.querySelector<HTMLElement>('.cs-links');
+
+  if (frame) {
+    gsap.fromTo(
+      frame,
+      { y: 32, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.15 },
+    );
+  }
+  if (stack) {
+    // Cortamos el stack por " · " para animar cada chip como span.
+    const parts = (stack.textContent ?? '').split(' · ');
+    if (parts.length > 1) {
+      stack.innerHTML = parts
+        .map((p, i) => `<span class="cs-chip" style="opacity:0">${p}</span>${i < parts.length - 1 ? '<span class="cs-chip-sep"> · </span>' : ''}`)
+        .join('');
+      gsap.to(stack.querySelectorAll('.cs-chip'), {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        ease: 'power3.out',
+        stagger: 0.05,
+        delay: 0.5,
+      });
+    }
+  }
+  if (links) {
+    gsap.fromTo(
+      links.children,
+      { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out', stagger: 0.08, delay: 0.35 },
+    );
+  }
+}
+
+/**
+ * Parallax 3D del browser frame: rotateY/rotateX según posición del cursor
+ * dentro del frame, con lerp 0.1 en rAF. Se aplica `perspective` al padre
+ * (.cs) y se transforma el frame. Solo pointer fine.
+ * Devuelve cleanup — el consumidor lo agrupa con los demás.
+ */
+function initFrameParallax(frame: HTMLElement): () => void {
+  if (!window.matchMedia('(pointer: fine)').matches) return () => {};
+  const parent = frame.closest<HTMLElement>('.cs') ?? frame.parentElement;
+  if (!parent) return () => {};
+  parent.style.perspective = '1200px';
+  frame.style.transformStyle = 'preserve-3d';
+  frame.style.willChange = 'transform';
+
+  let tx = 0;
+  let ty = 0;
+  let cx = 0;
+  let cy = 0;
+  let rafId = 0;
+
+  const onMove = (e: MouseEvent): void => {
+    const r = frame.getBoundingClientRect();
+    const nx = ((e.clientX - r.left) / r.width - 0.5) * 2; // -1..1
+    const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    tx = Math.max(-1, Math.min(1, nx));
+    ty = Math.max(-1, Math.min(1, ny));
+  };
+  const onLeave = (): void => {
+    tx = 0;
+    ty = 0;
+  };
+  const loop = (): void => {
+    cx += (tx - cx) * 0.1;
+    cy += (ty - cy) * 0.1;
+    const rotY = cx * 5;
+    const rotX = -cy * 5;
+    frame.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`;
+    rafId = requestAnimationFrame(loop);
+  };
+  frame.addEventListener('mousemove', onMove);
+  frame.addEventListener('mouseleave', onLeave);
+  rafId = requestAnimationFrame(loop);
+
+  return () => {
+    cancelAnimationFrame(rafId);
+    frame.removeEventListener('mousemove', onMove);
+    frame.removeEventListener('mouseleave', onLeave);
+    frame.style.transform = '';
+    frame.style.willChange = '';
+    parent.style.perspective = '';
+  };
+}
+
+/**
  * Case study cinemático: SVG line dibujado con scrub, nodos ◇ que se activan
  * por sección al entrar en viewport, y contadores GSAP en las métricas.
  * Métricas `[data-cs-pending]` no corren counter (renderizadas con punto pulsante).
  */
 export function initCaseStudy(): (() => void) | void {
   const body = document.querySelector<HTMLElement>('[data-cs-body]');
-  if (!body) return;
+  const frame = document.querySelector<HTMLElement>('.cs-media');
+  // Sin ninguno de los dos, no hay case study en esta página.
+  if (!body && !frame) return;
 
+  let cleanupParallax: () => void = () => {};
   const ctx = gsap.context(() => {
-    initLine(body);
-    initSteps(body);
-    initCounters(body);
-  }, body);
+    initEntrance();
+    if (body) {
+      initLine(body);
+      initSteps(body);
+      initCounters(body);
+    }
+    if (frame) {
+      cleanupParallax = initFrameParallax(frame);
+    }
+  }, document.body);
 
-  return () => ctx.revert();
+  return () => {
+    cleanupParallax();
+    ctx.revert();
+  };
 }
