@@ -196,12 +196,9 @@ body::after {
   height: 34px;
   margin: -17px 0 0 -17px;
   border: 1px solid rgb(0 219 213 / 0.45);
-  transition:
-    scale var(--duration-hover) var(--ease-out-power3),
-    border-color var(--duration-hover) ease;
+  transition: border-color var(--duration-hover) ease;
 }
 .cursor-ring--active {
-  scale: 1.5;
   border-color: var(--color-accent);
 }
 

@@ -153,6 +153,10 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
   }
   .navbar-bar {
     position: relative;
+    /* Nueva capa de apilamiento por encima del mega menu (que es hermano):
+       sin esto, el mega menu tapa el logo cuando abre porque va después
+       en el DOM. */
+    z-index: 2;
     border-inline: none;
     border-top: none;
     border-radius: 0;
@@ -254,7 +258,7 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
     }
   }
 
-  /* Logo-moneda: grande siempre. En scroll gira 1.5 vueltas (script). */
+  /* Logo-moneda: grande siempre. En scroll gira 2 vueltas (script). */
   .navbar-logo {
     position: relative;
     width: 72px;
@@ -264,6 +268,11 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
     place-items: center;
     overflow: visible;
     z-index: 2;
+    /* Sin este anclaje explícito, en móvil la ul de la izquierda se oculta
+       con display:none y logo + navbar-right colapsan a las 2 primeras
+       columnas (queda huella vacía a la derecha). Anclar en col 2 mantiene
+       el logo centrado y libera col 3 para navbar-right. */
+    grid-column: 2;
     justify-self: center;
     transition: filter var(--duration-hover) ease;
   }
@@ -342,6 +351,9 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
     justify-content: flex-end;
     gap: 0.75rem;
     white-space: nowrap;
+    /* Mismo motivo que .navbar-logo: forzar col 3 para que en móvil
+       EN + menu queden pegados al borde derecho en vez de junto al logo. */
+    grid-column: 3;
   }
 
   .navbar-cta {
