@@ -7,15 +7,18 @@ const SETTLE = 0.002;
 
 /**
  * Skew sutil del contenido proporcional a la velocidad del scroll.
- * Se aplica por sección (hijos de <main>) y NUNCA a la sección del timeline:
- * un transform en su ancestro rompería el position:fixed del pin de ScrollTrigger.
+ * Se aplica por sección (hijos de <main>) y NUNCA a secciones con pin de
+ * ScrollTrigger (timeline, projects cinema): un transform en su ancestro
+ * rompería el position:fixed del pin.
  */
+const PIN_EXCLUDE = '[data-timeline], [data-cinema]';
+
 export function initScrollSkew(): (() => void) | void {
   const main = document.getElementById('main-content');
   if (!main) return;
   const targets = [...main.children].filter(
     (el): el is HTMLElement =>
-      el instanceof HTMLElement && !el.matches('[data-timeline]') && !el.querySelector('[data-timeline]'),
+      el instanceof HTMLElement && !el.matches(PIN_EXCLUDE) && !el.querySelector(PIN_EXCLUDE),
   );
   if (targets.length === 0) return;
   for (const t of targets) t.style.transformOrigin = '50% 0';

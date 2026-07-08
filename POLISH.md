@@ -501,3 +501,19 @@ Sobre `[data-animate-title]`: cada palabra en `<span>` dentro de wrapper `overfl
 Sección nueva 60vh entre hero y `#proyectos`: 6 nodos SVG (1 por proyecto de `src/data/projects.ts`, coordenadas fijas). Líneas `stroke-dashoffset` dibujadas con ScrollTrigger scrub. Nodo: glow accent, hover tooltip mono (nombre+stack), click `scrollToTarget('#proyectos')`. Cierra el hueco de P0.2 con contenido.
 
 Orden para Opus: **P0 → P14 → P16 → P15 → P17**, luego P1–P13 según tabla original.
+
+---
+
+## Estado 2026-07-08 — sesión Fable en curso
+
+**Completado con Fable en sesiones anteriores**:
+- ✅ P5 — Hero ASCII field (`src/scripts/heroField.ts`, commit 624bf06)
+- ✅ E1+E2+E7 — Glyph tunnel + scroll skew + cursor trail (commit 9e386d2)
+
+**En esta sesión (~3% Fable restante)** — 3 features de firma senior (orden P20 → P18 → P19):
+- ✅ **P20 — Projects horizontal cinema** (`src/components/ProjectFlagshipCinema.astro` + `src/scripts/projectsCinema.ts`): flagships convertidos en capítulos horizontales pinneados con scrub, parallax de imagen ±4 xPercent y progress bar accent. Grid natural en mobile <1024px. `[data-cinema]` añadido a la exclusión de `scrollSkew.ts` para no romper el pin.
+- **P18 — Commentary Mode ("Show me how")**: marcadores flotantes junto a cada efecto técnico del sitio. Toggle discreto (botón footer o tecla `?`). Hover → tooltip con explicación técnica breve + link al archivo del script. Meta-portfolio autoguiado.
+- **P19 — Case Study cinemático + fix `[PENDIENTE]`** *(reemplaza P0.5 y refuerza P0.2)*: SVG line drawing que conecta problema → resultado, contadores GSAP en métricas, nodos ◇ por sección. `[PENDIENTE]` → punto pulsante + "medición en curso".
+
+**Todo lo demás (P0.1–P0.4, P1–P13, P14–P17) queda pendiente para Opus** con las specs y el orden ya fijados arriba.
+

@@ -3,7 +3,7 @@ import type { Lang } from '../../data/site';
 import { projects } from '../../data/projects';
 import { useTranslations } from '../../i18n/ui';
 import SectionHeading from '../SectionHeading.astro';
-import ProjectCard from '../ProjectCard.astro';
+import ProjectFlagshipCinema from '../ProjectFlagshipCinema.astro';
 
 import gekoImg from '../../assets/projects/geko-marketing.svg';
 import totalMuscleImg from '../../assets/projects/total-muscle.svg';
@@ -24,19 +24,35 @@ const flagshipList = projects.filter((p) => p.flagship);
 const rest = projects.filter((p) => !p.flagship);
 ---
 
-<section id="proyectos" class="container-site section-block">
-  <SectionHeading marker={t('section.projects')} title={lang === 'es' ? 'Proyectos' : 'Projects'} />
-
-  <div class="proj-flagships" data-reveal-group>
-    {
-      flagshipList.map((p) => {
-        const img = images[p.slug];
-        return img ? <ProjectCard project={p} image={img} lang={lang} /> : null;
-      })
-    }
+<section id="proyectos" class="section-block">
+  <div class="container-site">
+    <SectionHeading
+      marker={t('section.projects')}
+      title={lang === 'es' ? 'Proyectos' : 'Projects'}
+    />
   </div>
 
-  <div class="proj-rest" data-reveal-group>
+  <div class="proj-cinema" data-cinema data-proj-cinema>
+    <div class="proj-cinema-track" data-proj-track>
+      {
+        flagshipList.map((p, i) => {
+          const img = images[p.slug];
+          return img ? (
+            <ProjectFlagshipCinema
+              project={p}
+              image={img}
+              lang={lang}
+              index={i + 1}
+              total={flagshipList.length}
+            />
+          ) : null;
+        })
+      }
+    </div>
+    <div class="proj-cinema-progress" data-cin-progress aria-hidden="true"></div>
+  </div>
+
+  <div class="container-site proj-rest" data-reveal-group>
     {
       rest.map((p) => (
         <a
@@ -68,14 +84,44 @@ const rest = projects.filter((p) => !p.flagship);
     padding-block: clamp(4rem, 10vw, 7.5rem) 0;
   }
 
-  .proj-flagships {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  .proj-cinema {
+    position: relative;
+    overflow: hidden;
   }
-  @media (min-width: 768px) {
-    .proj-flagships {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+  .proj-cinema-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+  }
+  .proj-cinema-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-accent);
+    opacity: 0.7;
+    transform: scaleX(0);
+    transform-origin: left center;
+    pointer-events: none;
+  }
+
+  @media (max-width: 1023px) {
+    .proj-cinema {
+      overflow: visible;
+      margin-inline: auto;
+      max-width: 1200px;
+      padding-inline: clamp(1rem, 5vw, 4rem);
+    }
+    .proj-cinema-track {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      width: auto;
+      will-change: auto;
+    }
+    .proj-cinema-progress {
+      display: none;
     }
   }
 

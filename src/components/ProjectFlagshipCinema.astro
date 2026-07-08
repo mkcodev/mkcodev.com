@@ -1,0 +1,184 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../data/projects';
+import type { Lang } from '../data/site';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  project: Project;
+  image: ImageMetadata;
+  lang: Lang;
+  index: number;
+  total: number;
+}
+
+const { project, image, lang, index, total } = Astro.props;
+const t = useTranslations(lang);
+const href = lang === 'es' ? `/proyectos/${project.slug}` : `/en/projects/${project.slugEn}`;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<article class="cin-chapter" data-proj-chapter>
+  <div class="cin-inner">
+    <div class="cin-copy" data-cin-copy>
+      <p class="cin-index">
+        {pad(index)}<span class="cin-index-total"> / {pad(total)}</span>
+      </p>
+      <p class="cin-year">{project.year}</p>
+      <h3 class="cin-title" transition:name={`proj-title-${project.slug}`}>{project.title}</h3>
+      <p class="cin-desc">{project.description[lang]}</p>
+      <ul class="cin-stack" role="list">
+        {project.stack.map((item) => <li>{item}</li>)}
+      </ul>
+      <a class="cin-cta" href={href}>
+        <span class="cin-cta-bracket" aria-hidden="true">[</span>
+        {t('projects.case')}
+        <span class="cin-cta-bracket" aria-hidden="true">]</span>
+        <span class="cin-cta-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+    <div class="cin-media" transition:name={`proj-img-${project.slug}`}>
+      <Image src={image} alt={`Screenshot — ${project.title}`} data-cin-img />
+    </div>
+  </div>
+</article>
+
+<style>
+  .cin-chapter {
+    flex: 0 0 100vw;
+    height: 100svh;
+    display: grid;
+    align-items: center;
+  }
+  .cin-inner {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 5vw, 4rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .cin-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+  }
+  .cin-index {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    color: var(--color-accent);
+  }
+  .cin-index-total {
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+  .cin-year {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  .cin-title {
+    margin: 0;
+    font-size: var(--text-display);
+    line-height: var(--text-display--line-height);
+    letter-spacing: var(--text-display--letter-spacing);
+    font-weight: 700;
+    color: var(--color-white);
+  }
+  .cin-desc {
+    margin: 0;
+    max-width: 42ch;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-muted);
+  }
+
+  .cin-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cin-stack li {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--color-accent);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    padding: 0.125rem 0.5rem;
+  }
+
+  .cin-cta {
+    margin-top: 0.75rem;
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .cin-cta-arrow {
+    display: inline-block;
+    margin-left: 0.375rem;
+    transition: transform var(--duration-hover) var(--ease-out-power3);
+  }
+  .cin-cta:hover .cin-cta-arrow,
+  .cin-cta:focus-visible .cin-cta-arrow {
+    transform: translateX(4px);
+  }
+
+  .cin-media {
+    height: min(68svh, 620px);
+    overflow: hidden;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .cin-media img {
+    /* 110% + offset: margen para el parallax horizontal sin dejar bordes vistos */
+    width: 110%;
+    max-width: none;
+    height: 100%;
+    margin-left: -5%;
+    object-fit: cover;
+    display: block;
+    will-change: transform;
+  }
+
+  @media (max-width: 1023px) {
+    .cin-chapter {
+      flex: initial;
+      height: auto;
+    }
+    .cin-inner {
+      grid-template-columns: 1fr;
+      padding-inline: 0;
+      gap: 1.25rem;
+    }
+    .cin-media {
+      order: -1;
+      height: auto;
+      aspect-ratio: 16 / 10;
+    }
+    .cin-media img {
+      width: 100%;
+      margin-left: 0;
+      will-change: auto;
+    }
+    .cin-title {
+      font-size: var(--text-h2);
+      line-height: var(--text-h2--line-height);
+      letter-spacing: var(--text-h2--letter-spacing);
+    }
+    .cin-index {
+      font-size: var(--text-body);
+    }
+  }
+</style>
