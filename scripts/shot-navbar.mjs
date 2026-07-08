@@ -17,7 +17,10 @@ async function shootTopStrip(page, suffix) {
 }
 
 async function capture(width, height, suffix, actions) {
-  const page = await browser.newPage({ viewport: { width, height }, reducedMotion: 'no-preference' });
+  const page = await browser.newPage({
+    viewport: { width, height },
+    reducedMotion: 'no-preference',
+  });
   const errors = [];
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push(m.text());
@@ -76,4 +79,6 @@ total += await capture(1440, 900, 'section-active', async (page) => {
 total += await capture(390, 844, 'mobile');
 
 await browser.close();
-console.log(`done → ${OUT}/nav-{top,scrolled,hover-kbd,section-active,mobile}.png · errors: ${total}`);
+console.log(
+  `done → ${OUT}/nav-{top,scrolled,hover-kbd,section-active,mobile}.png · errors: ${total}`,
+);
