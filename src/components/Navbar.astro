@@ -165,6 +165,18 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
     border-inline: none;
     border-top: none;
     border-radius: 0;
+    transition:
+      background-color 220ms ease,
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      backdrop-filter 220ms ease;
+  }
+  /* En top: la clase .glass se remueve desde JS (initNavbar), así que
+     el bar queda transparente sin bg/border/blur. Solo hay que apagar
+     la hairline aquí. Al scrollear >8px, .glass vuelve al bar y aparece
+     todo el fondo con transición. */
+  .navbar.is-top .navbar-hairline {
+    opacity: 0;
   }
   .navbar-inner {
     position: relative;
@@ -352,6 +364,7 @@ const ctaLabel = lang === 'es' ? 'open to work' : 'open to work';
     transform-origin: 50% 50%;
     opacity: 0.55;
     pointer-events: none;
+    transition: opacity 220ms ease;
   }
 
   .navbar-right {

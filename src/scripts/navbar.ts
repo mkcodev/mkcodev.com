@@ -50,13 +50,27 @@ function initSectionActive(navbar: HTMLElement): (() => void) | undefined {
 export function initNavbar(): (() => void) | void {
   const navbar = document.querySelector<HTMLElement>('[data-navbar]');
   if (!navbar) return;
+  const bar = navbar.querySelector<HTMLElement>('.navbar-bar');
   const progress = navbar.querySelector<SVGCircleElement>('[data-nav-progress]');
   const logo = navbar.querySelector<HTMLElement>('[data-nav-logo]');
 
   let ticking = false;
+  let atTop: boolean | null = null;
+  const TOP_THRESHOLD = 8;
+
+  const setTopState = (next: boolean): void => {
+    if (next === atTop) return;
+    atTop = next;
+    navbar.classList.toggle('is-top', next);
+    // La clase .glass (utility de Tailwind v4) gana en cascada sobre cualquier
+    // regla scoped del componente. La única forma limpia de quitar bg + border
+    // + backdrop-filter en top es removerla del bar y devolverla al scrollear.
+    if (bar) bar.classList.toggle('glass', !next);
+  };
 
   const applyScroll = (): void => {
     const y = window.scrollY;
+    setTopState(y <= TOP_THRESHOLD);
     if (progress) {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const p = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
