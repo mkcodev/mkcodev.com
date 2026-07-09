@@ -78,7 +78,10 @@ function buildTabletReveal(cinema: HTMLElement): void {
  * Flagships:
  * - ≥1024px: cinema horizontal pinneado con GSAP.
  * - 768-1023px (tablet): chapters apilados con reveal fade+y por scroll.
- * - <768px (móvil): scroll horizontal nativo con CSS scroll-snap; sin GSAP.
+ * - <768px (móvil): scroll horizontal nativo con CSS scroll-snap.
+ *   Lenis intercepta los touch events globalmente, así que necesitamos
+ *   data-lenis-prevent en el cinema para que Lenis ignore ese contenedor
+ *   y el swipe horizontal llegue al scroll nativo del navegador.
  */
 export function initProjectsCinema(): (() => void) | void {
   const cinema = document.querySelector<HTMLElement>('[data-proj-cinema]');
@@ -87,5 +90,9 @@ export function initProjectsCinema(): (() => void) | void {
   const mm = gsap.matchMedia();
   mm.add('(min-width: 1024px)', () => buildCinema(cinema));
   mm.add('(min-width: 768px) and (max-width: 1023px)', () => buildTabletReveal(cinema));
+  mm.add('(max-width: 767px)', () => {
+    cinema.setAttribute('data-lenis-prevent', '');
+    return () => cinema.removeAttribute('data-lenis-prevent');
+  });
   return () => mm.revert();
 }
