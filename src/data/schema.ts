@@ -122,6 +122,38 @@ export function breadcrumbList(items: ReadonlyArray<{ name: string; url: string 
   };
 }
 
+interface ServiceNodeOpts {
+  url: string;
+  name: string;
+  description: string;
+  priceFrom: number;
+  priceTo: number;
+  priceUnit: 'proyecto' | 'mes';
+}
+
+export function serviceNode(opts: ServiceNodeOpts): SchemaNode {
+  return {
+    '@type': 'Service',
+    '@id': `${opts.url}#service`,
+    name: opts.name,
+    description: opts.description,
+    url: opts.url,
+    provider: { '@id': BUSINESS_ID },
+    areaServed: SITE.areaServed.map((name) => ({ '@type': 'City', name })),
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'EUR',
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        minPrice: opts.priceFrom,
+        maxPrice: opts.priceTo,
+        priceCurrency: 'EUR',
+        ...(opts.priceUnit === 'mes' ? { unitText: 'mes', billingIncrement: 1 } : {}),
+      },
+    },
+  };
+}
+
 export function faqPageNode(faqs: ReadonlyArray<{ q: string; a: string }>): SchemaNode {
   return {
     '@type': 'FAQPage',

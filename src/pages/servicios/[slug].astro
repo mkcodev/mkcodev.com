@@ -1,0 +1,49 @@
+---
+import Base from '../../layouts/Base.astro';
+import ServiceDetail from '../../components/services/ServiceDetail.astro';
+import { services } from '../../data/services';
+import { SITE_URL } from '../../data/site';
+import { webPageNode, breadcrumbList, serviceNode, faqPageNode } from '../../data/schema';
+
+export function getStaticPaths() {
+  return services.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+}
+
+const { service } = Astro.props;
+const lang = 'es' as const;
+const url = `${SITE_URL}/servicios/${service.slug}`;
+
+const schema = [
+  webPageNode({
+    url,
+    title: service.metaTitle,
+    description: service.metaDescription,
+    lang,
+    aboutBusiness: true,
+  }),
+  breadcrumbList([
+    { name: 'Inicio', url: SITE_URL },
+    { name: 'Servicios', url: `${SITE_URL}/servicios` },
+    { name: service.title, url },
+  ]),
+  serviceNode({
+    url,
+    name: service.title,
+    description: service.metaDescription,
+    priceFrom: service.priceFrom,
+    priceTo: service.priceTo,
+    priceUnit: service.priceUnit,
+  }),
+  faqPageNode(service.faqs),
+];
+---
+
+<Base
+  lang={lang}
+  title={service.metaTitle}
+  description={service.metaDescription}
+  ogImage={`/og/servicios-${service.slug}.png`}
+  schema={schema}
+>
+  <ServiceDetail service={service} />
+</Base>
