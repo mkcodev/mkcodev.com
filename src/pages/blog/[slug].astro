@@ -1,0 +1,324 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { SITE_URL } from '../../data/site';
+import { webPageNode, breadcrumbList, blogPostingNode } from '../../data/schema';
+import { readingTime } from '../../utils/readingTime';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang === 'es');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const lang = 'es' as const;
+const { Content } = await render(post);
+
+const url = `${SITE_URL}/blog/${post.id}`;
+const minutes = readingTime(post.body ?? '');
+
+const related = (
+  await getCollection('blog', ({ data, id }) => {
+    if (data.draft || data.lang !== 'es' || id === post.id) return false;
+    return data.tags.some((tag) => post.data.tags.includes(tag));
+  })
+).slice(0, 3);
+
+const dateFmt = new Intl.DateTimeFormat('es-ES', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const schema = [
+  webPageNode({ url, title: post.data.title, description: post.data.description, lang }),
+  breadcrumbList([
+    { name: 'Inicio', url: SITE_URL },
+    { name: 'Blog', url: `${SITE_URL}/blog` },
+    { name: post.data.title, url },
+  ]),
+  blogPostingNode({
+    url,
+    headline: post.data.title,
+    description: post.data.description,
+    datePublished: post.data.pubDate,
+    dateModified: post.data.updatedDate,
+  }),
+];
+---
+
+<Base
+  lang={lang}
+  title={`${post.data.title} — mkcodev`}
+  description={post.data.description}
+  ogImage={`/og/blog-${post.id}.png`}
+  schema={schema}
+>
+  <article class="container-site post-page">
+    <header class="post-header" data-reveal-group>
+      <nav class="post-breadcrumb" aria-label="Breadcrumb" data-reveal>
+        <a href="/blog">~/blog</a>
+        <span aria-hidden="true">/</span>
+        <span>{post.id}</span>
+      </nav>
+      <h1 class="post-title" data-reveal>{post.data.title}</h1>
+      <p class="post-meta" data-reveal>
+        <time datetime={post.data.pubDate.toISOString()}>{dateFmt.format(post.data.pubDate)}</time>
+        <span aria-hidden="true">·</span>
+        <span>{minutes} min de lectura</span>
+        {
+          post.data.updatedDate && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>actualizado el {dateFmt.format(post.data.updatedDate)}</span>
+            </>
+          )
+        }
+      </p>
+      {
+        post.data.tags.length > 0 && (
+          <ul class="post-tags" data-reveal>
+            {post.data.tags.map((tag) => (
+              <li class="post-tag">#{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <div class="post-prose">
+      <Content />
+    </div>
+
+    {
+      related.length > 0 && (
+        <aside class="post-related" aria-labelledby="related">
+          <h2 class="post-related-title" id="related">
+            <span class="post-prompt" aria-hidden="true">
+              $
+            </span>{' '}
+            ls relacionados/
+          </h2>
+          <ul class="post-related-list">
+            {related.map((r) => (
+              <li>
+                <a class="post-related-link" href={`/blog/${r.id}`}>
+                  {r.data.title}
+                  <span aria-hidden="true"> →</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+
+    <footer class="post-footer">
+      <a class="btn-terminal" href="/blog">
+        <span class="bracket bracket-l" aria-hidden="true">←</span>
+        volver_al_blog
+      </a>
+      <a class="btn-terminal btn-terminal--primary" href="/#contacto">
+        <span class="bracket bracket-l" aria-hidden="true">[</span>
+        pedir_presupuesto
+        <span class="bracket bracket-r" aria-hidden="true">]</span>
+      </a>
+    </footer>
+  </article>
+</Base>
+
+<style>
+  .post-page {
+    padding-block: clamp(7rem, 14vw, 10rem) 0;
+  }
+
+  .post-breadcrumb {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  .post-breadcrumb a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color var(--duration-hover) ease;
+  }
+  .post-breadcrumb a:hover,
+  .post-breadcrumb a:focus-visible {
+    color: var(--color-white);
+  }
+
+  .post-title {
+    margin: 0;
+    max-width: 800px;
+    font-size: var(--text-h2);
+    font-weight: 700;
+    letter-spacing: var(--text-h2--letter-spacing);
+    line-height: var(--text-h2--line-height);
+    color: var(--color-white);
+  }
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .post-tag {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+  }
+
+  .post-prose {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    max-width: 680px;
+    font-size: var(--text-body);
+    line-height: 1.75;
+    color: var(--color-text);
+  }
+  .post-prose :global(h2) {
+    margin: 2.5rem 0 1rem;
+    font-size: var(--text-h3);
+    font-weight: 700;
+    letter-spacing: var(--text-h3--letter-spacing);
+    color: var(--color-white);
+  }
+  .post-prose :global(h3) {
+    margin: 2rem 0 0.75rem;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .post-prose :global(p) {
+    margin: 0 0 1.25rem;
+  }
+  .post-prose :global(ul),
+  .post-prose :global(ol) {
+    margin: 0 0 1.25rem;
+    padding-left: 1.5rem;
+  }
+  .post-prose :global(li) {
+    margin-bottom: 0.5rem;
+  }
+  .post-prose :global(li::marker) {
+    color: var(--color-accent);
+  }
+  .post-prose :global(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color var(--duration-hover) ease;
+  }
+  .post-prose :global(a:hover),
+  .post-prose :global(a:focus-visible) {
+    color: var(--color-white);
+  }
+  .post-prose :global(strong) {
+    color: var(--color-white);
+  }
+  .post-prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+  }
+  .post-prose :global(pre) {
+    margin: 0 0 1.25rem;
+    padding: 1rem 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    font-size: var(--text-sm);
+  }
+  .post-prose :global(pre code) {
+    padding: 0;
+    background: none;
+    border: none;
+  }
+  .post-prose :global(blockquote) {
+    margin: 0 0 1.25rem;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    border-left: 2px solid var(--color-accent);
+    color: var(--color-muted);
+  }
+  .post-prose :global(table) {
+    width: 100%;
+    margin: 0 0 1.25rem;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+  .post-prose :global(th),
+  .post-prose :global(td) {
+    padding: 0.625rem 0.875rem;
+    text-align: left;
+    border: 1px solid var(--color-border-soft);
+  }
+  .post-prose :global(th) {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+    background: var(--color-surface);
+  }
+  .post-prose :global(hr) {
+    margin: 2rem 0;
+    border: none;
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .post-related {
+    margin-top: clamp(3rem, 6vw, 4rem);
+    max-width: 680px;
+  }
+  .post-related-title {
+    margin: 0 0 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .post-prompt {
+    color: var(--color-accent);
+  }
+  .post-related-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .post-related-link {
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color var(--duration-hover) ease;
+  }
+  .post-related-link:hover,
+  .post-related-link:focus-visible {
+    color: var(--color-accent);
+  }
+
+  .post-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: clamp(3rem, 6vw, 4rem);
+  }
+</style>

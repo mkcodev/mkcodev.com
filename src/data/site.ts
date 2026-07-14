@@ -3,7 +3,7 @@ export const SITE_URL = 'https://mkcodev.com';
 
 // Rutas excluidas del sitemap (noindex). Mantener sincronizado con las
 // páginas que pasan noIndex a Base.astro.
-export const NOINDEX_PATHS = ['/blog', '/en/blog'];
+export const NOINDEX_PATHS = ['/en/blog'];
 
 export const SITE = {
   name: 'mkcodev',
