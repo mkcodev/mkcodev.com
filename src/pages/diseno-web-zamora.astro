@@ -1,0 +1,77 @@
+---
+import Base from '../layouts/Base.astro';
+import LocationContent from '../components/LocationContent.astro';
+import { SITE_URL } from '../data/site';
+import { webPageNode, breadcrumbList, faqPageNode } from '../data/schema';
+
+const lang = 'es' as const;
+const title = 'Diseño web en Zamora | mkcodev';
+const description =
+  'Diseño y desarrollo web para negocios de Zamora y provincia. Webs a medida desde 1.500€, SEO local y digitalización de comercios. Raíces zamoranas, atención cercana.';
+const url = `${SITE_URL}/diseno-web-zamora`;
+
+const answerFirst =
+  'Diseño webs a medida desde 1.500€ para negocios de Zamora y provincia. Soy Mikel, desarrollador web con raíces en Manganeses de la Lampreana: conozco la provincia, atiendo en remoto con visitas periódicas y ayudo a comercios y empresas zamoranas a digitalizarse con una web que aparece en Google cuando sus clientes buscan.';
+
+const blocks = [
+  {
+    title: 'cat digitalizacion-zamora.md',
+    paragraphs: [
+      'La mayoría de los negocios de Zamora todavía no tiene una web profesional, y muchos de los que la tienen arrastran páginas antiguas que no aparecen en Google ni funcionan bien en el móvil. Eso es una oportunidad: en un mercado con poca competencia digital, una web bien hecha con SEO local te pone por delante de casi todos.',
+      'Trabajo con comercios, servicios profesionales, turismo rural y pymes de toda la provincia: Zamora capital, Benavente, Toro y la comarca de Tierra de Campos que conozco de primera mano.',
+    ],
+  },
+  {
+    title: 'cat como-trabajamos.md',
+    paragraphs: [
+      'El trabajo del día a día es en remoto — videollamada, teléfono o WhatsApp — con la misma cercanía que si estuviera en la puerta de al lado. Y como vuelvo a la provincia con regularidad, podemos vernos en persona cuando el proyecto lo pida.',
+      'Cada web sale con SEO local configurado: perfil de Google Business, datos estructurados y contenido pensado para las búsquedas reales de tus clientes en Zamora. El objetivo no es "tener web", es que te llamen por ella.',
+    ],
+  },
+];
+
+const faqs = [
+  {
+    q: '¿Cuánto cuesta una página web en Zamora?',
+    a: 'Una web corporativa a medida cuesta entre 1.500€ y 2.500€; una tienda online, entre 2.500€ y 4.500€. Precio cerrado por escrito antes de empezar, sin cuotas ocultas ni permanencias.',
+  },
+  {
+    q: '¿Atiendes en toda la provincia de Zamora?',
+    a: 'Sí: Zamora capital, Benavente, Toro y cualquier municipio de la provincia. El trabajo diario es en remoto y me desplazo para reuniones cuando hace falta — soy de Manganeses de la Lampreana y vuelvo con frecuencia.',
+  },
+  {
+    q: '¿Merece la pena el SEO local en Zamora?',
+    a: 'Especialmente en Zamora. Al haber poca competencia digital, posicionar un negocio local es mucho más rápido y barato que en una gran ciudad: con una web bien optimizada y un perfil de Google Business trabajado se pueden ver resultados en semanas, no en meses.',
+  },
+  {
+    q: '¿Puedo conseguir ayudas del Kit Digital para mi web?',
+    a: 'El programa Kit Digital subvenciona la digitalización de pymes y autónomos, incluida la creación de sitios web. Los plazos y condiciones cambian por convocatoria: cuéntame tu caso y te digo si tu negocio puede acogerse y cómo tramitarlo.',
+  },
+];
+
+const schema = [
+  webPageNode({ url, title, description, lang, aboutBusiness: true }),
+  breadcrumbList([
+    { name: 'Inicio', url: SITE_URL },
+    { name: 'Diseño web en Zamora', url },
+  ]),
+  faqPageNode(faqs),
+];
+---
+
+<Base
+  lang={lang}
+  title={title}
+  description={description}
+  ogImage="/og/diseno-web-zamora.png"
+  schema={schema}
+>
+  <LocationContent
+    marker="~/diseno-web-zamora"
+    h1="Diseño web en Zamora"
+    answerFirst={answerFirst}
+    blocks={blocks}
+    faqs={faqs}
+    coverage="Zamora · Benavente · Toro · provincia de Zamora"
+  />
+</Base>

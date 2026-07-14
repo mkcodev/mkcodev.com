@@ -1,0 +1,282 @@
+---
+// Presentación compartida de las páginas de ubicación (/diseno-web-bilbao,
+// /diseno-web-zamora). El contenido único de cada ciudad llega por props.
+import { services, formatPrice } from '../data/services';
+import { SITE } from '../data/site';
+
+export interface LocationBlock {
+  title: string;
+  paragraphs: string[];
+}
+
+interface Props {
+  marker: string;
+  h1: string;
+  answerFirst: string;
+  blocks: LocationBlock[];
+  faqs: Array<{ q: string; a: string }>;
+  /** Línea de cobertura del bloque NAP, p. ej. "Basauri · Bilbao · Gran Bilbao". */
+  coverage: string;
+}
+
+const { marker, h1, answerFirst, blocks, faqs, coverage } = Astro.props;
+
+const unitLabel = (u: 'proyecto' | 'mes') => (u === 'mes' ? '€/mes' : '€');
+---
+
+<article class="container-site location-page">
+  <header class="location-header" data-reveal-group>
+    <p class="location-marker" data-reveal>{marker}</p>
+    <h1 class="location-title" data-reveal>{h1}</h1>
+    <p class="location-answer" data-reveal>{answerFirst}</p>
+    <a class="btn-terminal btn-terminal--primary location-header-cta" href="/#contacto" data-reveal>
+      <span class="bracket bracket-l" aria-hidden="true">[</span>
+      pedir_presupuesto
+      <span class="bracket bracket-r" aria-hidden="true">]</span>
+    </a>
+  </header>
+
+  {
+    blocks.map((block, i) => (
+      <section class="location-section" aria-labelledby={`block-${i}`} data-reveal-group>
+        <h2 class="location-section-title" id={`block-${i}`} data-reveal>
+          <span class="location-prompt" aria-hidden="true">
+            $
+          </span>{' '}
+          {block.title}
+        </h2>
+        {block.paragraphs.map((p) => (
+          <p class="location-text" data-reveal>
+            {p}
+          </p>
+        ))}
+      </section>
+    ))
+  }
+
+  <section class="location-section" aria-labelledby="servicios" data-reveal-group>
+    <h2 class="location-section-title" id="servicios" data-reveal>
+      <span class="location-prompt" aria-hidden="true">$</span> ls servicios/
+    </h2>
+    <ul class="location-services">
+      {
+        services.map((s) => (
+          <li data-reveal>
+            <a class="location-service" href={`/servicios/${s.slug}`}>
+              <span class="location-service-name">{s.title}</span>
+              <span class="location-service-price">
+                desde {formatPrice(s.priceFrom)}
+                {unitLabel(s.priceUnit)}
+              </span>
+              <span class="location-service-arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="location-section" aria-labelledby="faq" data-reveal-group>
+    <h2 class="location-section-title" id="faq" data-reveal>
+      <span class="location-prompt" aria-hidden="true">$</span> cat faq.md
+    </h2>
+    <dl class="location-faqs">
+      {
+        faqs.map((f) => (
+          <div class="location-faq" data-reveal>
+            <dt class="location-faq-q">{f.q}</dt>
+            <dd class="location-faq-a">{f.a}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="location-cta" aria-labelledby="contacto-nap" data-reveal-group>
+    <h2 class="location-section-title" id="contacto-nap" data-reveal>
+      <span class="location-prompt" aria-hidden="true">$</span> cat contacto.md
+    </h2>
+    <address class="location-nap" data-reveal>
+      <p class="location-nap-line">
+        <strong>{SITE.author}</strong> — {SITE.name}
+      </p>
+      <p class="location-nap-line">{coverage}</p>
+      <p class="location-nap-line">
+        <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a> ·{' '}
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </p>
+    </address>
+    <a class="btn-terminal btn-terminal--primary" href="/#contacto" data-reveal>
+      <span class="bracket bracket-l" aria-hidden="true">[</span>
+      pedir_presupuesto
+      <span class="bracket bracket-r" aria-hidden="true">]</span>
+    </a>
+  </section>
+</article>
+
+<style>
+  .location-page {
+    padding-block: clamp(7rem, 14vw, 10rem) 0;
+  }
+
+  .location-marker {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+  }
+  .location-title {
+    margin: 0;
+    max-width: 800px;
+    font-size: var(--text-h2);
+    font-weight: 700;
+    letter-spacing: var(--text-h2--letter-spacing);
+    line-height: var(--text-h2--line-height);
+    color: var(--color-white);
+  }
+  .location-answer {
+    margin: 1.25rem 0 0;
+    max-width: 640px;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-text);
+  }
+  .location-header-cta {
+    margin-top: 1.75rem;
+  }
+
+  .location-section {
+    margin-top: clamp(3.5rem, 7vw, 5rem);
+  }
+  .location-section-title {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .location-prompt {
+    color: var(--color-accent);
+  }
+  .location-text {
+    margin: 0 0 1rem;
+    max-width: 640px;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-text);
+  }
+  .location-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .location-services {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+    max-width: 640px;
+  }
+  .location-service {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: border-color var(--duration-hover) ease;
+  }
+  .location-service:hover,
+  .location-service:focus-visible {
+    border-color: var(--color-accent-border);
+  }
+  .location-service-name {
+    font-size: var(--text-body);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .location-service-price {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    white-space: nowrap;
+  }
+  .location-service-arrow {
+    font-family: var(--font-mono);
+    color: var(--color-muted);
+    transition:
+      color var(--duration-hover) ease,
+      transform var(--duration-hover) ease;
+  }
+  .location-service:hover .location-service-arrow {
+    color: var(--color-accent);
+    transform: translateX(3px);
+  }
+
+  .location-faqs {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    max-width: 680px;
+  }
+  .location-faq {
+    padding: 1.25rem 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+  }
+  .location-faq-q {
+    margin: 0 0 0.5rem;
+    font-size: var(--text-body);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .location-faq-a {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.65;
+    color: var(--color-text);
+  }
+
+  .location-cta {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+    margin-top: clamp(3.5rem, 7vw, 5rem);
+    padding: 2rem 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+  }
+  .location-cta .location-section-title {
+    margin-bottom: 0;
+  }
+  .location-nap {
+    font-style: normal;
+    display: grid;
+    gap: 0.375rem;
+  }
+  .location-nap-line {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-text);
+  }
+  .location-nap-line strong {
+    color: var(--color-white);
+  }
+  .location-nap-line a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color var(--duration-hover) ease;
+  }
+  .location-nap-line a:hover,
+  .location-nap-line a:focus-visible {
+    color: var(--color-white);
+  }
+</style>

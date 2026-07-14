@@ -1,0 +1,77 @@
+---
+import Base from '../layouts/Base.astro';
+import LocationContent from '../components/LocationContent.astro';
+import { SITE_URL } from '../data/site';
+import { webPageNode, breadcrumbList, faqPageNode } from '../data/schema';
+
+const lang = 'es' as const;
+const title = 'Diseño web en Bilbao y Gran Bilbao | mkcodev';
+const description =
+  'Diseño y desarrollo web en Bilbao y el Gran Bilbao con reuniones presenciales. Webs a medida desde 1.500€, SEO local y trato directo. Base en Basauri.';
+const url = `${SITE_URL}/diseno-web-bilbao`;
+
+const answerFirst =
+  'Soy Mikel, desarrollador web freelance en el Gran Bilbao (Basauri). Diseño webs a medida desde 1.500€ para negocios de Bilbao y alrededores, con reuniones presenciales, SEO local para aparecer en Google Maps y trato directo: hablas siempre con quien construye tu web, sin agencias de por medio.';
+
+const blocks = [
+  {
+    title: 'cat por-que-local.md',
+    paragraphs: [
+      'Trabajar con un desarrollador de tu zona tiene ventajas reales: nos reunimos en persona en Bilbao o en cualquier punto del Gran Bilbao (Basauri, Barakaldo, Getxo, Galdakao…), conozco el tejido comercial de la zona y puedo visitarte para entender tu negocio antes de escribir una línea de código.',
+      'Además, formo parte de la comunidad de desarrolladores de Bilbao (Bilbo-dev), lo que me mantiene al día de lo que funciona ahora — no de lo que funcionaba hace cinco años. Tu web se construye con las mismas herramientas que usan los mejores productos digitales: Astro, Next.js y React.',
+    ],
+  },
+  {
+    title: 'cat seo-local-bilbao.md',
+    paragraphs: [
+      'Si tu negocio atiende a clientes de Bilbao, tu web tiene que aparecer cuando alguien busca tu servicio con "Bilbao" al lado. Configuro tu perfil de Google Business, los datos estructurados y el contenido local para que compitas en el mapa y en los resultados orgánicos de tu zona.',
+      'También optimizo tu presencia para los buscadores con IA (ChatGPT, Perplexity, AI Overviews de Google), que cada vez responden más búsquedas del tipo "diseñador web en Bilbao" antes de que el usuario llegue a Google.',
+    ],
+  },
+];
+
+const faqs = [
+  {
+    q: '¿Cuánto cuesta una página web en Bilbao?',
+    a: 'Una web corporativa a medida cuesta entre 1.500€ y 2.500€; una tienda online, entre 2.500€ y 4.500€. Son precios de freelance: sin la estructura de una agencia, pagas por el trabajo, no por las oficinas. El presupuesto se cierra por escrito antes de empezar.',
+  },
+  {
+    q: '¿Nos podemos reunir en persona?',
+    a: 'Sí. Vivo en Basauri y me muevo por todo el Gran Bilbao: Bilbao, Barakaldo, Getxo, Galdakao, Durango… La primera reunión, presencial o por videollamada, es gratuita y sin compromiso.',
+  },
+  {
+    q: '¿Trabajas con negocios pequeños?',
+    a: 'Sí, es mi cliente principal: comercios, clínicas, asesorías, restaurantes y profesionales que necesitan una web que traiga clientes, no un folleto digital. El proyecto se dimensiona a tu presupuesto, empezando por lo que más impacto tiene.',
+  },
+  {
+    q: '¿Qué diferencia hay entre contratarte a ti y a una agencia?',
+    a: 'Trato directo y código a medida. En una agencia tu proyecto pasa por comercial, gestor y desarrolladores que no conoces; conmigo hablas siempre con la persona que diseña y programa tu web. Y el resultado no es una plantilla de WordPress: es código propio, más rápido y más seguro.',
+  },
+];
+
+const schema = [
+  webPageNode({ url, title, description, lang, aboutBusiness: true }),
+  breadcrumbList([
+    { name: 'Inicio', url: SITE_URL },
+    { name: 'Diseño web en Bilbao', url },
+  ]),
+  faqPageNode(faqs),
+];
+---
+
+<Base
+  lang={lang}
+  title={title}
+  description={description}
+  ogImage="/og/diseno-web-bilbao.png"
+  schema={schema}
+>
+  <LocationContent
+    marker="~/diseno-web-bilbao"
+    h1="Diseño web en Bilbao y Gran Bilbao"
+    answerFirst={answerFirst}
+    blocks={blocks}
+    faqs={faqs}
+    coverage="Basauri · Bilbao · Gran Bilbao (Bizkaia)"
+  />
+</Base>
