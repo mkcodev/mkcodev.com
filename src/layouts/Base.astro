@@ -7,7 +7,7 @@ import jetbrainsMonoUrl from '@fontsource-variable/jetbrains-mono/files/jetbrain
 
 import '../styles/global.css';
 import { SITE, SITE_URL, type Lang } from '../data/site';
-import { hreflangPair } from '../i18n/routes';
+import { hreflangPair, isEsOnly } from '../i18n/routes';
 import { useTranslations } from '../i18n/ui';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
@@ -28,7 +28,9 @@ const t = useTranslations(lang);
 
 const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const canonical = new URL(path === '/' ? '/' : path, SITE_URL).href;
-const pair = hreflangPair(path);
+// Las páginas ES-only (servicios, ubicaciones, posts, legales) no llevan
+// hreflang: una página monolingüe solo necesita canonical.
+const pair = isEsOnly(path) ? null : hreflangPair(path);
 const ogImageAbs = new URL(ogImage, SITE_URL).href;
 
 const jsonLd = {
@@ -78,9 +80,15 @@ const jsonLd = {
     <meta name="theme-color" content={SITE.themeColor} />
     {noIndex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="es" href={new URL(pair.es, SITE_URL).href} />
-    <link rel="alternate" hreflang="en" href={new URL(pair.en, SITE_URL).href} />
-    <link rel="alternate" hreflang="x-default" href={new URL(pair.es, SITE_URL).href} />
+    {
+      pair && (
+        <>
+          <link rel="alternate" hreflang="es" href={new URL(pair.es, SITE_URL).href} />
+          <link rel="alternate" hreflang="en" href={new URL(pair.en, SITE_URL).href} />
+          <link rel="alternate" hreflang="x-default" href={new URL(pair.es, SITE_URL).href} />
+        </>
+      )
+    }
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 

@@ -56,7 +56,7 @@ const TERM_SCRIPT: ReadonlyArray<{ cmd: string; out: string }> = [
   { cmd: 'pnpm build', out: '✓ 24 pages · 1.4s' },
   { cmd: 'pnpm check', out: '0 errors · 0 warnings' },
   { cmd: 'git commit -m "feat: ship"', out: '[main 4f2a1c9] feat: ship' },
-  { cmd: 'vercel --prod', out: '✓ mkcodev.vercel.app' },
+  { cmd: 'vercel --prod', out: '✓ mkcodev.com' },
 ];
 
 function initTermLoop(grid: HTMLElement): Cleanup {

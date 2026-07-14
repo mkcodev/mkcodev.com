@@ -1,6 +1,6 @@
 # mk-portfolio — CLAUDE.md
 
-Portfolio de Mikel Salvador García (mkcodev). Astro 7 + TS strict + Tailwind v4 + GSAP + Lenis. Dark only. Deploy: Vercel (`mkcodev.vercel.app`).
+Portfolio de Mikel Salvador García (mkcodev). Astro 7 + TS strict + Tailwind v4 + GSAP + Lenis. Dark only. Deploy: Vercel (`mkcodev.com`).
 
 ## Reglas duras
 

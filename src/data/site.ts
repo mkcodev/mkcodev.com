@@ -1,5 +1,9 @@
 // Única fuente de verdad del sitio — cambiar dominio = editar SITE_URL
-export const SITE_URL = 'https://mkcodev.vercel.app';
+export const SITE_URL = 'https://mkcodev.com';
+
+// Rutas excluidas del sitemap (noindex). Mantener sincronizado con las
+// páginas que pasan noIndex a Base.astro.
+export const NOINDEX_PATHS = ['/blog', '/en/blog'];
 
 export const SITE = {
   name: 'mkcodev',
@@ -13,7 +17,12 @@ export const SITE = {
     en: 'Design, code, performance and SEO: the full life of a web product.',
   },
   location: 'Bilbao, Spain',
-  email: 'maikcode@protonmail.com',
+  email: 'info@mkcodev.com',
+  phone: '+34644801966',
+  phoneDisplay: '644 801 966',
+  addressLocality: 'Basauri',
+  addressRegion: 'Bizkaia',
+  areaServed: ['Bilbao', 'Gran Bilbao', 'Basauri', 'Zamora'],
   github: 'https://github.com/mkcodev',
   linkedin: 'https://www.linkedin.com/in/mkcodev',
   cvPath: '/cv-mikel-salvador.pdf',

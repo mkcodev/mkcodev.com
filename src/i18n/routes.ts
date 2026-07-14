@@ -17,6 +17,28 @@ const enToEs: Record<string, string> = Object.fromEntries(
   Object.entries(esToEn).map(([es, en]) => [en, es]),
 );
 
+/**
+ * Páginas comerciales solo en español (servicios, ubicaciones, posts, legales).
+ * No tienen par EN: sin hreflang, el toggle de idioma lleva al home EN.
+ * Prefijos con '/' final matchean subrutas; el resto, ruta exacta.
+ */
+const esOnlyPrefixes = [
+  '/servicios',
+  '/diseno-web-bilbao',
+  '/diseno-web-zamora',
+  '/blog/',
+  '/aviso-legal',
+  '/privacidad',
+  '/cookies',
+] as const;
+
+export function isEsOnly(path: string): boolean {
+  const p = normalize(path);
+  return esOnlyPrefixes.some((prefix) =>
+    prefix.endsWith('/') ? p.startsWith(prefix) : p === prefix || p.startsWith(`${prefix}/`),
+  );
+}
+
 function normalize(path: string): string {
   const clean = path.replace(/\/+$/, '');
   return clean === '' ? '/' : clean;
