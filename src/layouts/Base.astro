@@ -108,6 +108,32 @@ const jsonLd = {
         ad_personalization: 'denied',
       });
     </script>
+    <!-- Fix: startViewTransition puede lanzar InvalidStateError en Chrome cuando
+         prefers-reduced-motion está activo o hay transiciones rápidas. Si lanza,
+         ejecutar el callback directamente (swap sin animación visual). -->
+    <script is:inline>
+      (function () {
+        if (!('startViewTransition' in document)) return;
+        var _orig = document.startViewTransition.bind(document);
+        document.startViewTransition = function (cb) {
+          try {
+            return _orig(cb);
+          } catch (_e) {
+            var p = Promise.resolve().then(function () {
+              return cb && cb();
+            });
+            var noop = function () {};
+            return {
+              updateCallbackDone: p,
+              finished: p.then(noop, noop),
+              ready: p.then(noop, noop),
+              skipTransition: noop,
+              types: new Set(),
+            };
+          }
+        };
+      })();
+    </script>
     <ClientRouter />
   </head>
   <body>
